@@ -2,12 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
-import AddWord from "./pages/AddWord";
-import WordList from "./pages/WordList";
-import StudyMode from "./pages/StudyMode";
 import Settings from "./pages/Settings";
+import StudyMode from "./pages/StudyMode";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,10 +18,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/add" element={<AddWord />} />
-          <Route path="/words" element={<WordList />} />
-          <Route path="/study" element={<StudyMode />} />
+          <Route path="/study/:setId" element={<StudyMode />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/add" element={<Navigate to="/settings" replace />} />
+          <Route path="/words" element={<Navigate to="/" replace />} />
+          <Route path="/study" element={<Navigate to="/" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

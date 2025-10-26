@@ -4,7 +4,7 @@ import { Download, Upload, Trash2, FileJson } from 'lucide-react';
 import { useState } from 'react';
 import Header from '@/components/Header';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Word } from '@/types/word';
+import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
@@ -22,13 +22,11 @@ import {
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [words, setWords] = useLocalStorage<Word[]>('korean-words', []);
-  const [, setKnownWords] = useLocalStorage<number[]>('known-words', []);
-  const [, setStudyIndex] = useLocalStorage<number>('study-index', 0);
+  const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [jsonInput, setJsonInput] = useState('');
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(words, null, 2);
+    const dataStr = JSON.stringify(vocabSets, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
@@ -36,7 +34,7 @@ const Settings = () => {
     link.download = `korean-cards-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success('Words exported successfully! ✅');
+    toast.success('Sets exported successfully! ✅');
   };
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,10 +44,10 @@ const Settings = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const importedWords = JSON.parse(e.target?.result as string);
-        if (Array.isArray(importedWords)) {
-          setWords(importedWords);
-          toast.success('Words imported successfully! ✅');
+        const importedData = JSON.parse(e.target?.result as string);
+        if (Array.isArray(importedData)) {
+          setVocabSets(importedData);
+          toast.success('Sets imported successfully! ✅');
         } else {
           toast.error('Invalid file format');
         }
@@ -63,14 +61,17 @@ const Settings = () => {
   const handleJsonImport = () => {
     try {
       const parsedData = JSON.parse(jsonInput);
-      if (!Array.isArray(parsedData)) {
-        toast.error('Invalid format: Must be an array');
+      if (!Array.isArray(parsedData) || parsedData.length === 0) {
+        toast.error('Invalid format: Must be a non-empty array');
         return;
       }
 
-      const importedWords: Word[] = parsedData.map((item, index) => ({
+      const setName = parsedData[0]?.set || `Vocab ${vocabSets.length + 1}`;
+      const setId = `set-${Date.now()}`;
+
+      const importedWords = parsedData.map((item, index) => ({
         id: Date.now() + index,
-        set: item.set || '',
+        set: item.set || setName,
         korean: item.korean || '',
         uzbek: item.uzbek || '',
         romanization: item.romanization || '',
@@ -80,7 +81,14 @@ const Settings = () => {
         isKnown: false
       }));
 
-      setWords(importedWords);
+      const newSet: VocabSet = {
+        id: setId,
+        name: setName,
+        words: importedWords,
+        createdAt: Date.now()
+      };
+
+      setVocabSets([...vocabSets, newSet]);
       setJsonInput('');
       toast.success(`JSON imported successfully ✅ (${importedWords.length} words)`);
     } catch (error) {
@@ -89,9 +97,7 @@ const Settings = () => {
   };
 
   const handleReset = () => {
-    setWords([]);
-    setKnownWords([]);
-    setStudyIndex(0);
+    setVocabSets([]);
     toast.success('All data cleared! 🗑️');
     navigate('/');
   };
@@ -146,11 +152,11 @@ const Settings = () => {
               </p>
               <Button
                 onClick={handleExport}
-                disabled={words.length === 0}
+                disabled={vocabSets.length === 0}
                 className="w-full btn-glow bg-primary text-primary-foreground"
               >
                 <Download className="mr-2 h-5 w-5" />
-                Export All Words
+                Export All Sets
               </Button>
             </div>
 

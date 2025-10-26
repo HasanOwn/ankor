@@ -1,31 +1,36 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Shuffle, Heart } from 'lucide-react';
 import Header from '@/components/Header';
 import Flashcard from '@/components/Flashcard';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Word } from '@/types/word';
+import { VocabSet, Word } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const StudyMode = () => {
   const navigate = useNavigate();
-  const [words] = useLocalStorage<Word[]>('korean-words', []);
-  const [knownWords, setKnownWords] = useLocalStorage<number[]>('known-words', []);
-  const [currentIndex, setCurrentIndex] = useLocalStorage<number>('study-index', 0);
+  const { setId } = useParams<{ setId: string }>();
+  const [vocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledWords, setShuffledWords] = useState<Word[]>([]);
+  const [currentSet, setCurrentSet] = useState<VocabSet | null>(null);
+  const [knownWords, setKnownWords] = useLocalStorage<number[]>('known-words', []);
 
   useEffect(() => {
-    if (words.length === 0) {
+    const foundSet = vocabSets.find(set => set.id === setId);
+    
+    if (!foundSet) {
       navigate('/');
       return;
     }
 
-    // Shuffle words on mount
-    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    setCurrentSet(foundSet);
+    const shuffled = [...foundSet.words].sort(() => Math.random() - 0.5);
     setShuffledWords(shuffled);
-  }, []);
+    setCurrentIndex(0);
+  }, [setId, vocabSets, navigate]);
 
   const currentWord = shuffledWords[currentIndex];
   const isKnown = currentWord ? knownWords.includes(currentWord.id) : false;
@@ -43,7 +48,8 @@ const StudyMode = () => {
   };
 
   const handleShuffle = () => {
-    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    if (!currentSet) return;
+    const shuffled = [...currentSet.words].sort(() => Math.random() - 0.5);
     setShuffledWords(shuffled);
     setCurrentIndex(0);
     toast.success('Cards shuffled! 🔄');
@@ -76,8 +82,8 @@ const StudyMode = () => {
           className="space-y-8"
         >
           <div className="text-center">
-            {currentWord?.set && (
-              <div className="text-sm text-muted-foreground mb-2">{currentWord.set}</div>
+            {currentSet && (
+              <div className="text-lg text-muted-foreground mb-2">{currentSet.name}</div>
             )}
             <h1 className="text-4xl font-bold mb-2">Study Mode</h1>
             <p className="text-muted-foreground">
