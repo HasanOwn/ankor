@@ -1,7 +1,10 @@
 export interface Word {
   id: number;
+  set?: string;
   korean: string;
-  meaning: string;
+  uzbek?: string;
+  meaning?: string;
+  romanization?: string;
   example?: string;
   createdAt: number;
   isKnown?: boolean;

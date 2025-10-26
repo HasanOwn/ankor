@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, Upload, Trash2 } from 'lucide-react';
+import { Download, Upload, Trash2, FileJson } from 'lucide-react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Word } from '@/types/word';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -23,6 +25,7 @@ const Settings = () => {
   const [words, setWords] = useLocalStorage<Word[]>('korean-words', []);
   const [, setKnownWords] = useLocalStorage<number[]>('known-words', []);
   const [, setStudyIndex] = useLocalStorage<number>('study-index', 0);
+  const [jsonInput, setJsonInput] = useState('');
 
   const handleExport = () => {
     const dataStr = JSON.stringify(words, null, 2);
@@ -57,6 +60,34 @@ const Settings = () => {
     reader.readAsText(file);
   };
 
+  const handleJsonImport = () => {
+    try {
+      const parsedData = JSON.parse(jsonInput);
+      if (!Array.isArray(parsedData)) {
+        toast.error('Invalid format: Must be an array');
+        return;
+      }
+
+      const importedWords: Word[] = parsedData.map((item, index) => ({
+        id: Date.now() + index,
+        set: item.set || '',
+        korean: item.korean || '',
+        uzbek: item.uzbek || '',
+        romanization: item.romanization || '',
+        meaning: item.meaning || item.uzbek || '',
+        example: item.example || '',
+        createdAt: Date.now(),
+        isKnown: false
+      }));
+
+      setWords(importedWords);
+      setJsonInput('');
+      toast.success(`JSON imported successfully ✅ (${importedWords.length} words)`);
+    } catch (error) {
+      toast.error('Invalid JSON format');
+    }
+  };
+
   const handleReset = () => {
     setWords([]);
     setKnownWords([]);
@@ -83,6 +114,30 @@ const Settings = () => {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
+            {/* JSON Paste Import */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Paste JSON Data</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Paste JSON array to import words instantly
+              </p>
+              <Textarea
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+                placeholder='[{"set": "Vocab 1", "uzbek": "Davlat", "korean": "나라", "romanization": "nara"}]'
+                className="min-h-[120px] font-mono text-sm"
+              />
+              <Button
+                onClick={handleJsonImport}
+                disabled={!jsonInput.trim()}
+                className="w-full btn-glow bg-primary text-primary-foreground mt-2"
+              >
+                <FileJson className="mr-2 h-5 w-5" />
+                Import JSON
+              </Button>
+            </div>
+
+            <div className="border-t border-border" />
+
             {/* Export */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Export Words</h3>

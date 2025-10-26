@@ -35,12 +35,29 @@ const Flashcard = ({ word }: FlashcardProps) => {
             transform: "rotateY(180deg)"
           }}
         >
-          <div className="text-3xl font-semibold mb-6 text-center">{word.meaning}</div>
-          {word.example && (
-            <div className="text-lg text-muted-foreground text-center italic max-w-md">
-              "{word.example}"
-            </div>
-          )}
+          <div className="space-y-4 text-center max-w-md">
+            {word.uzbek && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground mb-1">Uzbek</p>
+                <p className="text-2xl font-semibold">{word.uzbek}</p>
+              </div>
+            )}
+            {word.romanization && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground mb-1">Romanization</p>
+                <p className="text-xl">{word.romanization}</p>
+              </div>
+            )}
+            {word.meaning && !word.uzbek && (
+              <div className="text-3xl font-semibold mb-6">{word.meaning}</div>
+            )}
+            {word.example && (
+              <div className="bg-muted/30 rounded-lg p-4 mt-4">
+                <p className="text-sm text-muted-foreground mb-1">Example</p>
+                <p className="text-lg italic">"{word.example}"</p>
+              </div>
+            )}
+          </div>
           <div className="mt-6 text-sm text-muted-foreground">Tap to flip back</div>
         </div>
       </motion.div>

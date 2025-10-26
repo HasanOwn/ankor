@@ -76,6 +76,9 @@ const StudyMode = () => {
           className="space-y-8"
         >
           <div className="text-center">
+            {currentWord?.set && (
+              <div className="text-sm text-muted-foreground mb-2">{currentWord.set}</div>
+            )}
             <h1 className="text-4xl font-bold mb-2">Study Mode</h1>
             <p className="text-muted-foreground">
               Card {currentIndex + 1} of {shuffledWords.length}
