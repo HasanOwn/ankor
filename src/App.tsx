@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import StudyMode from "./pages/StudyMode";
+import WordList from "./pages/WordList";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/study/:setId" element={<StudyMode />} />
+          <Route path="/words/:setId" element={<WordList />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/add" element={<Navigate to="/settings" replace />} />
           <Route path="/words" element={<Navigate to="/" replace />} />

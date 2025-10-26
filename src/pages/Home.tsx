@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, BookOpen, Trash2 } from 'lucide-react';
+import { Plus, BookOpen, Trash2, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import StatsBox from '@/components/StatsBox';
@@ -96,6 +96,15 @@ const Home = () => {
                     </div>
                   </button>
                   
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/words/${set.id}`)}
+                    className="hover:bg-accent"
+                  >
+                    <Edit className="h-5 w-5" />
+                  </Button>
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button 
