@@ -23,7 +23,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   
-  const totalWords = vocabSets.reduce((sum, set) => sum + set.words.length, 0);
+  const totalWords = vocabSets.reduce((sum, set) => sum + (set.words?.length || 0), 0);
   const totalSets = vocabSets.length;
 
   const handleDeleteSet = (setId: string, setName: string) => {
@@ -91,7 +91,7 @@ const Home = () => {
                       <span className="text-2xl">📘</span>
                       <div>
                         <h3 className="font-semibold text-lg">{set.name}</h3>
-                        <p className="text-sm text-muted-foreground">{set.words.length} words</p>
+                        <p className="text-sm text-muted-foreground">{set.words?.length || 0} words</p>
                       </div>
                     </div>
                   </button>
