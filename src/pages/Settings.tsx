@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, Upload, Trash2, FileJson } from 'lucide-react';
 import { useState } from 'react';
+import { z } from 'zod';
 import Header from '@/components/Header';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet } from '@/types/word';
@@ -19,6 +20,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+// Zod schema for validating imported word data
+const wordSchema = z.object({
+  set: z.string().trim().max(100).optional(),
+  korean: z.string().trim().min(1, "Korean text is required").max(200, "Korean text too long"),
+  uzbek: z.string().trim().min(1, "Uzbek text is required").max(200, "Uzbek text too long"),
+  romanization: z.string().trim().min(1, "Romanization is required").max(200, "Romanization too long"),
+  example: z.string().trim().max(500, "Example too long").optional(),
+  meaning: z.string().trim().max(200, "Meaning too long").optional()
+});
+
+const importSchema = z.array(wordSchema).min(1, "Must have at least one word").max(500, "Cannot import more than 500 words at once");
+
+const vocabSetSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1).max(100),
+  words: z.array(z.object({
+    id: z.number(),
+    set: z.string().optional(),
+    korean: z.string().min(1),
+    uzbek: z.string().min(1),
+    romanization: z.string().min(1),
+    meaning: z.string().optional(),
+    example: z.string().optional(),
+    createdAt: z.number(),
+    isKnown: z.boolean().optional()
+  })),
+  createdAt: z.number()
+}).strict();
+
+const vocabSetsSchema = z.array(vocabSetSchema);
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -45,14 +77,21 @@ const Settings = () => {
     reader.onload = (e) => {
       try {
         const importedData = JSON.parse(e.target?.result as string);
-        if (Array.isArray(importedData)) {
-          setVocabSets(importedData);
-          toast.success('Sets imported successfully! ✅');
-        } else {
-          toast.error('Invalid file format');
-        }
+        
+        // Validate the imported data structure
+        const validatedData = vocabSetsSchema.parse(importedData) as VocabSet[];
+        
+        setVocabSets(validatedData);
+        toast.success('Sets imported successfully! ✅');
       } catch (error) {
-        toast.error('Error importing file');
+        if (error instanceof z.ZodError) {
+          const firstError = error.errors[0];
+          toast.error(`Invalid data: ${firstError.message}`);
+        } else if (error instanceof SyntaxError) {
+          toast.error('Invalid JSON format');
+        } else {
+          toast.error('Error importing file');
+        }
       }
     };
     reader.readAsText(file);
@@ -61,21 +100,20 @@ const Settings = () => {
   const handleJsonImport = () => {
     try {
       const parsedData = JSON.parse(jsonInput);
-      if (!Array.isArray(parsedData) || parsedData.length === 0) {
-        toast.error('Invalid format: Must be a non-empty array');
-        return;
-      }
+      
+      // Validate the parsed data against schema
+      const validatedData = importSchema.parse(parsedData);
 
-      const setName = parsedData[0]?.set || `Vocab ${vocabSets.length + 1}`;
+      const setName = validatedData[0]?.set || `Vocab ${vocabSets.length + 1}`;
       const setId = `set-${Date.now()}`;
 
-      const importedWords = parsedData.map((item, index) => ({
+      const importedWords = validatedData.map((item, index) => ({
         id: Date.now() + index,
         set: item.set || setName,
-        korean: item.korean || '',
-        uzbek: item.uzbek || '',
-        romanization: item.romanization || '',
-        meaning: item.meaning || item.uzbek || '',
+        korean: item.korean,
+        uzbek: item.uzbek,
+        romanization: item.romanization,
+        meaning: item.meaning || item.uzbek,
         example: item.example || '',
         createdAt: Date.now(),
         isKnown: false
@@ -92,7 +130,14 @@ const Settings = () => {
       setJsonInput('');
       toast.success(`JSON imported successfully ✅ (${importedWords.length} words)`);
     } catch (error) {
-      toast.error('Invalid JSON format');
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(`Invalid data: ${firstError.message}`);
+      } else if (error instanceof SyntaxError) {
+        toast.error('Invalid JSON format');
+      } else {
+        toast.error('Error processing data');
+      }
     }
   };
 
