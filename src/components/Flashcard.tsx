@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Word } from '@/types/word';
+import { CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface FlashcardProps {
   word: Word;
+  isKnown?: boolean;
+  onToggleKnown?: () => void;
 }
 
-const Flashcard = ({ word }: FlashcardProps) => {
+const Flashcard = ({ word, isKnown, onToggleKnown }: FlashcardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <div className="perspective-1000 w-full max-w-2xl mx-auto">
+    <div className="perspective-1000 w-full max-w-2xl mx-auto space-y-4">
       <motion.div
         className="relative w-full h-[400px] cursor-pointer"
         onClick={() => setIsFlipped(!isFlipped)}
@@ -61,6 +65,24 @@ const Flashcard = ({ word }: FlashcardProps) => {
           <div className="mt-6 text-sm text-muted-foreground">Tap to flip back</div>
         </div>
       </motion.div>
+
+      {/* Mark as Learned Button */}
+      {onToggleKnown && (
+        <div className="flex justify-center">
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleKnown();
+            }}
+            variant={isKnown ? "default" : "outline"}
+            className="btn-glow"
+            size="lg"
+          >
+            <CheckCircle2 className={`mr-2 h-5 w-5 ${isKnown ? 'fill-current' : ''}`} />
+            {isKnown ? 'Learned ✓' : 'Mark as Learned'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

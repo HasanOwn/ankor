@@ -92,7 +92,11 @@ const StudyMode = () => {
           </div>
 
           {/* Flashcard */}
-          <Flashcard word={currentWord} />
+          <Flashcard 
+            word={currentWord} 
+            isKnown={isKnown}
+            onToggleKnown={toggleKnown}
+          />
 
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -104,15 +108,6 @@ const StudyMode = () => {
             >
               <ChevronLeft className="mr-2 h-5 w-5" />
               Previous
-            </Button>
-
-            <Button
-              onClick={toggleKnown}
-              variant={isKnown ? "default" : "outline"}
-              className="btn-glow w-full sm:w-auto"
-            >
-              <Heart className={`mr-2 h-5 w-5 ${isKnown ? 'fill-current' : ''}`} />
-              {isKnown ? 'Known' : 'Mark as Known'}
             </Button>
 
             <Button

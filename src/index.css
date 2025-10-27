@@ -8,41 +8,75 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* ChatGPT-inspired dark theme - always dark */
-    --background: 0 0% 7%;
-    --foreground: 0 0% 100%;
+    /* Light mode - soft eye-care colors */
+    --background: 40 20% 97%;
+    --foreground: 0 0% 10%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 0 0% 75%;
-    --primary-foreground: 0 0% 7%;
+    --primary: 210 50% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 40 15% 90%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 40 15% 92%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 0 0% 18%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 40 20% 88%;
+    --accent-foreground: 0 0% 10%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 40%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 210 50% 50%;
 
     --radius: 0.75rem;
 
-    /* Glow effect for buttons */
-    --glow: 0 0% 85%;
+    --glow: 210 50% 60%;
     
-    /* Success accent */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    /* Dark mode - deep charcoal eye-care colors */
+    --background: 220 15% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 220 15% 11%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 15% 11%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 210 50% 60%;
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 220 10% 16%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 220 10% 20%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 220 12% 18%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 10% 22%;
+    --input: 220 10% 22%;
+    --ring: 210 50% 50%;
+
+    --glow: 210 50% 70%;
+    
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
   }
