@@ -34,9 +34,13 @@ const Home = () => {
       words: [],
       createdAt: Date.now()
     };
-    setVocabSets([...vocabSets, newSet]);
+    const updatedSets = [...vocabSets, newSet];
+    setVocabSets(updatedSets);
     toast.success(`${name} created!`);
-    navigate(`/words/${newSet.id}`);
+    // Small delay to ensure localStorage is updated before navigation
+    setTimeout(() => {
+      navigate(`/words/${newSet.id}`);
+    }, 100);
   };
 
   const getLearnedCount = (setId: string) => {
