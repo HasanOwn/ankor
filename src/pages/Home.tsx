@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Search from '@/components/Search';
 import CreateSetDialog from '@/components/CreateSetDialog';
+import { CloudShareDialog } from '@/components/CloudShareDialog';
 import { useState } from 'react';
 
 const Home = () => {
@@ -48,6 +49,20 @@ const Home = () => {
     if (!set?.words) return 0;
     return set.words.filter(word => knownWords.includes(word.id)).length;
   };
+
+  const handleImportSets = (newSets: VocabSet[]) => {
+    const existingNames = new Set(vocabSets.map(s => s.name.toLowerCase()));
+    const setsToAdd = newSets.filter(s => !existingNames.has(s.name.toLowerCase()));
+    
+    if (setsToAdd.length > 0) {
+      setVocabSets([...vocabSets, ...setsToAdd]);
+    }
+    
+    const skipped = newSets.length - setsToAdd.length;
+    if (skipped > 0) {
+      toast.info(`Skipped ${skipped} duplicate set(s)`);
+    }
+  };
   const containerVariants = {
     hidden: {
       opacity: 0
@@ -79,6 +94,10 @@ const Home = () => {
         onOpenChange={setShowCreateDialog}
         onCreateSet={handleCreateSet}
       />
+      
+      <div className="fixed bottom-6 right-6 z-50">
+        <CloudShareDialog vocabSets={vocabSets} onImport={handleImportSets} />
+      </div>
       
       <main className="container max-w-4xl mx-auto px-4 pt-24 pb-12">
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-12">
