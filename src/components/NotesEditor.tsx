@@ -167,16 +167,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
             id="notes-textarea"
             value={currentNote}
             onChange={(e) => setCurrentNote(e.target.value)}
-            placeholder="Start writing your Korean grammar notes here...
-
-Examples:
-# Verb Conjugation
-- Present tense: 가다 → 가요
-- Past tense: 가다 → 갔어요
-
-## Particles
-**Subject**: 이/가
-**Object**: 을/를"
+            placeholder="Start writing your Korean grammar notes here..."
             className="flex-1 min-h-[400px] font-mono text-sm resize-none"
           />
 
