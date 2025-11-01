@@ -1,24 +1,26 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Settings, Search, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, Settings, Search, BookText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/components/ThemeProvider';
 
 interface HeaderProps {
   showBack?: boolean;
   showSettings?: boolean;
   showSearch?: boolean;
   onSearchClick?: () => void;
+  showNotes?: boolean;
+  onNotesClick?: () => void;
 }
 
 const Header = ({
   showBack = false,
   showSettings = false,
   showSearch = false,
-  onSearchClick
+  onSearchClick,
+  showNotes = false,
+  onNotesClick
 }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme } = useTheme();
   return <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -33,14 +35,14 @@ const Header = ({
               <Search className="h-5 w-5" />
             </Button>}
           
-          <Button 
+          {showNotes && <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={onNotesClick}
             className="btn-glow"
           >
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+            <BookText className="h-5 w-5" />
+          </Button>}
 
           {showSettings && location.pathname === '/' && <Button variant="ghost" size="icon" onClick={() => navigate('/settings')} className="btn-glow">
               <Settings className="h-5 w-5" />

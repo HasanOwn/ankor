@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Search from '@/components/Search';
 import CreateSetDialog from '@/components/CreateSetDialog';
 import { CloudShareDialog } from '@/components/CloudShareDialog';
+import NotesEditor from '@/components/NotesEditor';
 import { useState } from 'react';
 
 const Home = () => {
@@ -19,6 +20,7 @@ const Home = () => {
   const [knownWords] = useLocalStorage<number[]>('known-words', []);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   
   const totalWords = vocabSets.reduce((sum, set) => sum + (set.words?.length || 0), 0);
   const totalSets = vocabSets.length;
@@ -85,9 +87,23 @@ const Home = () => {
     }
   };
   return <div className="min-h-screen bg-background">
-      <Header showSettings showSearch onSearchClick={() => setShowSearch(true)} />
+      <Header 
+        showSettings 
+        showSearch 
+        showNotes
+        onSearchClick={() => setShowSearch(true)} 
+        onNotesClick={() => setShowNotes(true)}
+      />
       
       {showSearch && <Search vocabSets={vocabSets} onClose={() => setShowSearch(false)} />}
+      
+      {showNotes && <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50" onClick={() => setShowNotes(false)}>
+        <div className="h-full flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-4xl">
+            <NotesEditor onClose={() => setShowNotes(false)} />
+          </div>
+        </div>
+      </div>}
       
       <CreateSetDialog 
         open={showCreateDialog} 
@@ -95,7 +111,7 @@ const Home = () => {
         onCreateSet={handleCreateSet}
       />
       
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 left-6 z-50">
         <CloudShareDialog vocabSets={vocabSets} onImport={handleImportSets} />
       </div>
       

@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, Upload, Trash2, FileJson } from 'lucide-react';
+import { Download, Upload, Trash2, FileJson, Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { z } from 'zod';
 import Header from '@/components/Header';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useTheme } from '@/components/ThemeProvider';
 import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,6 +57,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [jsonInput, setJsonInput] = useState('');
+  const { theme, setTheme } = useTheme();
 
   const handleExport = () => {
     const dataStr = JSON.stringify(vocabSets, null, 2);
@@ -165,6 +167,33 @@ const Settings = () => {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
+            {/* Theme Toggle */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Appearance</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Switch between light and dark mode
+              </p>
+              <Button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                variant="outline"
+                className="w-full btn-glow"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="mr-2 h-5 w-5" />
+                    Switch to Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="mr-2 h-5 w-5" />
+                    Switch to Dark Mode
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="border-t border-border" />
+
             {/* JSON Paste Import */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Paste JSON Data</h3>

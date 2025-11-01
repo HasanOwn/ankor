@@ -57,11 +57,11 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
     try {
       const { error } = await supabase
         .from('vocab_sets')
-        .insert({
+        .insert([{
           username: username.trim().toLowerCase(),
           set_name: setToUpload.name,
-          data: setToUpload.words
-        });
+          data: setToUpload.words as any
+        }]);
 
       if (error) throw error;
 
