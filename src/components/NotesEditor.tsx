@@ -21,10 +21,9 @@ interface NotesEditorProps {
 }
 
 const NotesEditor = ({ onClose }: NotesEditorProps) => {
-  const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('vocab-sets', []);
+  const [documents, setDocuments] = useLocalStorage<Document[]>('my-documents', []);
   const [currentDoc, setCurrentDoc] = useState<Document | null>(null);
   const [title, setTitle] = useState('');
-  const [selectedSetId, setSelectedSetId] = useState<string>('');
 
   const editor = useEditor({
     extensions: [
@@ -56,11 +55,6 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
       return;
     }
 
-    if (!selectedSetId) {
-      toast.error('Please select a set');
-      return;
-    }
-
     const content = editor.getHTML();
     const now = Date.now();
 
@@ -68,23 +62,10 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
       ? { ...currentDoc, title, content, updatedAt: now }
       : { id: crypto.randomUUID(), title, content, createdAt: now, updatedAt: now };
 
-    const updatedSets = vocabSets.map(set => {
-      if (set.id === selectedSetId) {
-        const existingDocs = set.documents || [];
-        const docIndex = existingDocs.findIndex(d => d.id === newDoc.id);
-        
-        if (docIndex >= 0) {
-          existingDocs[docIndex] = newDoc;
-        } else {
-          existingDocs.push(newDoc);
-        }
+    const updatedDocs = documents.filter(d => d.id !== newDoc.id);
+    updatedDocs.push(newDoc);
 
-        return { ...set, documents: existingDocs };
-      }
-      return set;
-    });
-
-    setVocabSets(updatedSets);
+    setDocuments(updatedDocs);
     setCurrentDoc(newDoc);
     toast.success('Document saved! ✅');
   };
@@ -125,10 +106,6 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
     editor?.commands.setContent(doc.content);
   };
 
-  const getDocumentsFromSet = () => {
-    const set = vocabSets.find(s => s.id === selectedSetId);
-    return set?.documents || [];
-  };
 
   return (
     <div className="bg-card border border-border rounded-2xl shadow-2xl max-h-[90vh] flex flex-col w-full max-w-7xl">
@@ -163,7 +140,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
         <div className="w-64 flex flex-col gap-2">
           <h3 className="font-semibold text-sm">My Documents</h3>
           <ScrollArea className="flex-1 border border-border rounded-lg p-2">
-            {selectedSetId && getDocumentsFromSet().map((doc) => (
+            {documents.map((doc) => (
               <Button
                 key={doc.id}
                 variant="ghost"
@@ -174,7 +151,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
                 <span className="truncate">{doc.title}</span>
               </Button>
             ))}
-            {selectedSetId && getDocumentsFromSet().length === 0 && (
+            {documents.length === 0 && (
               <p className="text-sm text-muted-foreground p-2">No documents yet</p>
             )}
           </ScrollArea>
@@ -182,26 +159,12 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
 
         {/* Editor Area */}
         <div className="flex-1 flex flex-col gap-4 min-h-0">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Document Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="flex-1"
-            />
-            <Select value={selectedSetId} onValueChange={setSelectedSetId}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select a set" />
-              </SelectTrigger>
-              <SelectContent>
-                {vocabSets.map(set => (
-                  <SelectItem key={set.id} value={set.id}>
-                    {set.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Input
+            placeholder="Document Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="flex-1"
+          />
 
           <div className="flex flex-wrap gap-1 p-2 bg-muted rounded-lg">
             {/* Font Family */}
@@ -253,21 +216,16 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
                 editor?.isActive('heading', { level: 3 }) ? '3' :
                 editor?.isActive('heading', { level: 4 }) ? '4' :
                 editor?.isActive('heading', { level: 5 }) ? '5' :
-                editor?.isActive('heading', { level: 6 }) ? '6' : 'p'
+                editor?.isActive('heading', { level: 6 }) ? '6' : '1'
               }
               onValueChange={(value) => {
-                if (value === 'p') {
-                  editor?.chain().focus().setParagraph().run();
-                } else {
-                  editor?.chain().focus().toggleHeading({ level: parseInt(value) as 1 | 2 | 3 | 4 | 5 | 6 }).run();
-                }
+                editor?.chain().focus().toggleHeading({ level: parseInt(value) as 1 | 2 | 3 | 4 | 5 | 6 }).run();
               }}
             >
               <SelectTrigger className="w-[100px] h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="p">Paragraph</SelectItem>
                 <SelectItem value="1">Heading 1</SelectItem>
                 <SelectItem value="2">Heading 2</SelectItem>
                 <SelectItem value="3">Heading 3</SelectItem>
@@ -277,31 +235,30 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
               </SelectContent>
             </Select>
 
-            {/* Text Color */}
-            <input
-              type="color"
-              onInput={(e) => editor?.chain().focus().setColor(e.currentTarget.value).run()}
-              value={editor?.getAttributes('textStyle').color || '#000000'}
-              className="h-8 w-12 rounded border border-border cursor-pointer"
-              title="Text Color"
-            />
-
-            {/* Highlight Color */}
+            {/* Text Color - 7 preset colors */}
             <div className="flex gap-1">
-              <input
-                type="color"
-                onInput={(e) => editor?.chain().focus().toggleHighlight({ color: e.currentTarget.value }).run()}
-                className="h-8 w-12 rounded border border-border cursor-pointer"
-                title="Highlight Color"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor?.chain().focus().toggleHighlight().run()}
-                className={editor?.isActive('highlight') ? 'bg-accent' : ''}
-              >
-                <Highlighter className="h-4 w-4" />
-              </Button>
+              {['#000000', '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF'].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => editor?.chain().focus().setColor(color).run()}
+                  className="h-8 w-8 rounded border-2 border-border hover:border-foreground transition-colors"
+                  style={{ backgroundColor: color }}
+                  title={`Text Color ${color}`}
+                />
+              ))}
+            </div>
+
+            {/* Highlight - 3 preset colors */}
+            <div className="flex gap-1">
+              {['#FFFF00', '#00FFFF', '#FF00FF'].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => editor?.chain().focus().toggleHighlight({ color }).run()}
+                  className="h-8 w-8 rounded border-2 border-border hover:border-foreground transition-colors"
+                  style={{ backgroundColor: color }}
+                  title={`Highlight ${color}`}
+                />
+              ))}
             </div>
 
             {/* Lists */}
