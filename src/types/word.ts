@@ -10,10 +10,19 @@ export interface Word {
   isKnown?: boolean;
 }
 
+export interface Document {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface VocabSet {
   id: string;
   name: string;
   words: Word[];
+  documents?: Document[];
   createdAt: number;
 }
 
