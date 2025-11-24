@@ -1,20 +1,18 @@
 import { useState } from 'react';
-import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, Highlighter, FileText } from 'lucide-react';
+import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from 'sonner';
-import { VocabSet, Document } from '@/types/word';
+import { Document } from '@/types/word';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
-import Color from '@tiptap/extension-color';
-import { TextStyle } from '@tiptap/extension-text-style';
-import Highlight from '@tiptap/extension-highlight';
 import FontFamily from '@tiptap/extension-font-family';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import FontSize from '@tiptap/extension-font-size';
 
 interface NotesEditorProps {
   onClose: () => void;
@@ -30,13 +28,10 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
       StarterKit,
       Underline,
       TextStyle,
-      Color,
-      Highlight.configure({
-        multicolor: true,
-      }),
       FontFamily.configure({
         types: ['textStyle'],
       }),
+      FontSize,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
@@ -106,9 +101,8 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
     editor?.commands.setContent(doc.content);
   };
 
-
   return (
-    <div className="bg-card border border-border rounded-2xl shadow-2xl max-h-[90vh] flex flex-col w-full max-w-7xl">
+    <div className="bg-card border border-border rounded-2xl shadow-2xl max-h-[90vh] flex flex-col w-full max-w-5xl">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="text-xl font-semibold">📝 Document Editor</h2>
         <div className="flex items-center gap-2">
@@ -135,185 +129,140 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
         </div>
       </div>
 
-      <div className="flex-1 flex gap-4 min-h-0 p-4">
-        {/* Document List Sidebar */}
-        <div className="w-64 flex flex-col gap-2">
-          <h3 className="font-semibold text-sm">My Documents</h3>
-          <ScrollArea className="flex-1 border border-border rounded-lg p-2">
-            {documents.map((doc) => (
-              <Button
-                key={doc.id}
-                variant="ghost"
-                className="w-full justify-start mb-1 text-left"
-                onClick={() => loadDocument(doc)}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                <span className="truncate">{doc.title}</span>
-              </Button>
-            ))}
-            {documents.length === 0 && (
-              <p className="text-sm text-muted-foreground p-2">No documents yet</p>
-            )}
-          </ScrollArea>
-        </div>
+      <div className="flex-1 flex flex-col gap-4 p-4 min-h-0">
+        <Input
+          placeholder="Document Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-        {/* Editor Area */}
-        <div className="flex-1 flex flex-col gap-4 min-h-0">
-          <Input
-            placeholder="Document Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="flex-1"
-          />
+        <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+          {/* Font Family */}
+          <Select
+            value={editor?.getAttributes('textStyle').fontFamily || 'Arial'}
+            onValueChange={(value) => editor?.chain().focus().setFontFamily(value).run()}
+          >
+            <SelectTrigger className="w-[140px] h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Arial">Arial</SelectItem>
+              <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+              <SelectItem value="cursive">Cursive</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-wrap gap-1 p-2 bg-muted rounded-lg">
-            {/* Font Family */}
-            <Select
-              value={editor?.getAttributes('textStyle').fontFamily || 'Arial'}
-              onValueChange={(value) => editor?.chain().focus().setFontFamily(value).run()}
-            >
-              <SelectTrigger className="w-[140px] h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Arial">Arial</SelectItem>
-                <SelectItem value="Times New Roman">Times New Roman</SelectItem>
-                <SelectItem value="cursive">Cursive</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Font Size */}
+          <Select
+            value={editor?.getAttributes('textStyle').fontSize || '16px'}
+            onValueChange={(value) => editor?.chain().focus().setFontSize(value).run()}
+          >
+            <SelectTrigger className="w-[80px] h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="12px">12</SelectItem>
+              <SelectItem value="14px">14</SelectItem>
+              <SelectItem value="16px">16</SelectItem>
+              <SelectItem value="18px">18</SelectItem>
+              <SelectItem value="20px">20</SelectItem>
+              <SelectItem value="24px">24</SelectItem>
+              <SelectItem value="32px">32</SelectItem>
+            </SelectContent>
+          </Select>
 
-            {/* Text Formatting */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().toggleBold().run()}
-              className={editor?.isActive('bold') ? 'bg-accent' : ''}
-            >
-              <Bold className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
-              className={editor?.isActive('italic') ? 'bg-accent' : ''}
-            >
-              <Italic className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().toggleUnderline().run()}
-              className={editor?.isActive('underline') ? 'bg-accent' : ''}
-            >
-              <UnderlineIcon className="h-4 w-4" />
-            </Button>
+          <div className="w-px h-6 bg-border" />
 
-            {/* Headings */}
-            <Select
-              value={
-                editor?.isActive('heading', { level: 1 }) ? '1' :
-                editor?.isActive('heading', { level: 2 }) ? '2' :
-                editor?.isActive('heading', { level: 3 }) ? '3' :
-                editor?.isActive('heading', { level: 4 }) ? '4' :
-                editor?.isActive('heading', { level: 5 }) ? '5' :
-                editor?.isActive('heading', { level: 6 }) ? '6' : '1'
-              }
-              onValueChange={(value) => {
-                editor?.chain().focus().toggleHeading({ level: parseInt(value) as 1 | 2 | 3 | 4 | 5 | 6 }).run();
-              }}
-            >
-              <SelectTrigger className="w-[100px] h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">Heading 1</SelectItem>
-                <SelectItem value="2">Heading 2</SelectItem>
-                <SelectItem value="3">Heading 3</SelectItem>
-                <SelectItem value="4">Heading 4</SelectItem>
-                <SelectItem value="5">Heading 5</SelectItem>
-                <SelectItem value="6">Heading 6</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Text Formatting */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            className={editor?.isActive('bold') ? 'bg-accent' : ''}
+          >
+            <Bold className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            className={editor?.isActive('italic') ? 'bg-accent' : ''}
+          >
+            <Italic className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+            className={editor?.isActive('underline') ? 'bg-accent' : ''}
+          >
+            <UnderlineIcon className="h-4 w-4" />
+          </Button>
 
-            {/* Text Color - 7 preset colors */}
-            <div className="flex gap-1">
-              {['#000000', '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF'].map((color) => (
-                <button
-                  key={color}
-                  onClick={() => editor?.chain().focus().setColor(color).run()}
-                  className="h-8 w-8 rounded border-2 border-border hover:border-foreground transition-colors"
-                  style={{ backgroundColor: color }}
-                  title={`Text Color ${color}`}
-                />
-              ))}
-            </div>
+          <div className="w-px h-6 bg-border" />
 
-            {/* Highlight - 3 preset colors */}
-            <div className="flex gap-1">
-              {['#FFFF00', '#00FFFF', '#FF00FF'].map((color) => (
-                <button
-                  key={color}
-                  onClick={() => editor?.chain().focus().toggleHighlight({ color }).run()}
-                  className="h-8 w-8 rounded border-2 border-border hover:border-foreground transition-colors"
-                  style={{ backgroundColor: color }}
-                  title={`Highlight ${color}`}
-                />
-              ))}
-            </div>
+          {/* Lists */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            className={editor?.isActive('bulletList') ? 'bg-accent' : ''}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            className={editor?.isActive('orderedList') ? 'bg-accent' : ''}
+          >
+            <ListOrdered className="h-4 w-4" />
+          </Button>
 
-            {/* Lists */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().toggleBulletList().run()}
-              className={editor?.isActive('bulletList') ? 'bg-accent' : ''}
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-              className={editor?.isActive('orderedList') ? 'bg-accent' : ''}
-            >
-              <ListOrdered className="h-4 w-4" />
-            </Button>
+          <div className="w-px h-6 bg-border" />
 
-            {/* Alignment */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-              className={editor?.isActive({ textAlign: 'left' }) ? 'bg-accent' : ''}
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-              className={editor?.isActive({ textAlign: 'center' }) ? 'bg-accent' : ''}
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-              className={editor?.isActive({ textAlign: 'right' }) ? 'bg-accent' : ''}
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="flex-1 min-h-0 border border-border rounded-lg overflow-auto bg-background">
-            <EditorContent editor={editor} />
-          </div>
-
-          <Button onClick={handleSave} className="w-full btn-glow">
-            Save Document
+          {/* Alignment */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+            className={editor?.isActive({ textAlign: 'left' }) ? 'bg-accent' : ''}
+          >
+            <AlignLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+            className={editor?.isActive({ textAlign: 'center' }) ? 'bg-accent' : ''}
+          >
+            <AlignCenter className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+            className={editor?.isActive({ textAlign: 'right' }) ? 'bg-accent' : ''}
+          >
+            <AlignRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+            className={editor?.isActive({ textAlign: 'justify' }) ? 'bg-accent' : ''}
+          >
+            <AlignJustify className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="flex-1 min-h-0 border border-border rounded-lg overflow-auto bg-background">
+          <EditorContent editor={editor} />
+        </div>
+
+        <Button onClick={handleSave} className="w-full btn-glow">
+          Save Document
+        </Button>
       </div>
     </div>
   );
