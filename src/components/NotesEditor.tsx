@@ -226,7 +226,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
           </Sheet>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2 p-2 bg-muted rounded-lg overflow-x-auto">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2 p-2 bg-muted rounded-lg">
           {/* Font Family */}
           <Select
             value={editor?.getAttributes('textStyle').fontFamily || 'Arial'}
@@ -295,7 +295,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            onClick={() => editor?.chain().focus().toggleList('bulletList', 'listItem').run()}
             className={`h-8 w-8 p-0 ${editor?.isActive('bulletList') ? 'bg-accent' : ''}`}
           >
             <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -303,7 +303,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            onClick={() => editor?.chain().focus().toggleList('orderedList', 'listItem').run()}
             className={`h-8 w-8 p-0 ${editor?.isActive('orderedList') ? 'bg-accent' : ''}`}
           >
             <ListOrdered className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
