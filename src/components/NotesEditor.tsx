@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
+import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -11,7 +11,10 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import FontFamily from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import FontSize from '@tiptap/extension-font-size';
 
 interface NotesEditorProps {
@@ -22,12 +25,25 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
   const [documents, setDocuments] = useLocalStorage<Document[]>('my-documents', []);
   const [currentDoc, setCurrentDoc] = useState<Document | null>(null);
   const [title, setTitle] = useState('');
+  const [showNotes, setShowNotes] = useState(false);
+
+  const textColors = ['#000000', '#FF0000', '#0000FF', '#00FF00', '#FF6B00'];
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
       Underline,
       TextStyle,
+      Color,
       FontFamily.configure({
         types: ['textStyle'],
       }),
@@ -99,6 +115,29 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
     setCurrentDoc(doc);
     setTitle(doc.title);
     editor?.commands.setContent(doc.content);
+    setShowNotes(false);
+  };
+
+  const handleDelete = (docId: string) => {
+    const updatedDocs = documents.filter(d => d.id !== docId);
+    setDocuments(updatedDocs);
+    if (currentDoc?.id === docId) {
+      setCurrentDoc(null);
+      setTitle('');
+      editor?.commands.setContent('');
+    }
+    toast.success('Document deleted! ✅');
+  };
+
+  const handleExportDoc = (doc: Document) => {
+    const dataBlob = new Blob([doc.content], { type: 'text/html' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${doc.title.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.html`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Document exported! ✅');
   };
 
   return (
@@ -130,24 +169,81 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
       </div>
 
       <div className="flex-1 flex flex-col gap-4 p-4 min-h-0">
-        <Input
-          placeholder="Document Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Document Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="flex-1 h-9"
+          />
+          <Sheet open={showNotes} onOpenChange={setShowNotes}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">My Notes</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>My Documents</SheetTitle>
+              </SheetHeader>
+              <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
+                <div className="flex flex-col gap-2">
+                  {documents.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">No documents yet</p>
+                  ) : (
+                    documents.map((doc) => (
+                      <div key={doc.id} className="p-3 border border-border rounded-lg hover:bg-accent transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                          <button
+                            onClick={() => loadDocument(doc)}
+                            className="flex-1 text-left"
+                          >
+                            <p className="font-medium text-sm">{doc.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(doc.updatedAt).toLocaleDateString()}
+                            </p>
+                          </button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleExportDoc(doc)}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleDelete(doc.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </SheetContent>
+          </Sheet>
+        </div>
 
-        <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+        <div className="flex items-center gap-1 sm:gap-2 p-2 bg-muted rounded-lg overflow-x-auto">
           {/* Font Family */}
           <Select
             value={editor?.getAttributes('textStyle').fontFamily || 'Arial'}
             onValueChange={(value) => editor?.chain().focus().setFontFamily(value).run()}
           >
-            <SelectTrigger className="w-[140px] h-8">
+            <SelectTrigger className="w-[100px] sm:w-[120px] h-8 text-xs sm:text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Arial">Arial</SelectItem>
-              <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+              <SelectItem value="Times New Roman">Times</SelectItem>
               <SelectItem value="cursive">Cursive</SelectItem>
             </SelectContent>
           </Select>
@@ -157,7 +253,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
             value={editor?.getAttributes('textStyle').fontSize || '16px'}
             onValueChange={(value) => editor?.chain().focus().setFontSize(value).run()}
           >
-            <SelectTrigger className="w-[80px] h-8">
+            <SelectTrigger className="w-[60px] sm:w-[70px] h-8 text-xs sm:text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -171,89 +267,106 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
             </SelectContent>
           </Select>
 
-          <div className="w-px h-6 bg-border" />
+          <div className="w-px h-6 bg-border hidden sm:block" />
 
           {/* Text Formatting */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().toggleBold().run()}
-            className={editor?.isActive('bold') ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive('bold') ? 'bg-accent' : ''}`}
           >
-            <Bold className="h-4 w-4" />
+            <Bold className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().toggleItalic().run()}
-            className={editor?.isActive('italic') ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive('italic') ? 'bg-accent' : ''}`}
           >
-            <Italic className="h-4 w-4" />
+            <Italic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().toggleUnderline().run()}
-            className={editor?.isActive('underline') ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive('underline') ? 'bg-accent' : ''}`}
           >
-            <UnderlineIcon className="h-4 w-4" />
+            <UnderlineIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
 
-          <div className="w-px h-6 bg-border" />
+          <div className="w-px h-6 bg-border hidden sm:block" />
 
           {/* Lists */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            className={editor?.isActive('bulletList') ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive('bulletList') ? 'bg-accent' : ''}`}
           >
-            <List className="h-4 w-4" />
+            <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            className={editor?.isActive('orderedList') ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive('orderedList') ? 'bg-accent' : ''}`}
           >
-            <ListOrdered className="h-4 w-4" />
+            <ListOrdered className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
 
-          <div className="w-px h-6 bg-border" />
+          <div className="w-px h-6 bg-border hidden sm:block" />
 
           {/* Alignment */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-            className={editor?.isActive({ textAlign: 'left' }) ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive({ textAlign: 'left' }) ? 'bg-accent' : ''}`}
           >
-            <AlignLeft className="h-4 w-4" />
+            <AlignLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-            className={editor?.isActive({ textAlign: 'center' }) ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive({ textAlign: 'center' }) ? 'bg-accent' : ''}`}
           >
-            <AlignCenter className="h-4 w-4" />
+            <AlignCenter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-            className={editor?.isActive({ textAlign: 'right' }) ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive({ textAlign: 'right' }) ? 'bg-accent' : ''}`}
           >
-            <AlignRight className="h-4 w-4" />
+            <AlignRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-            className={editor?.isActive({ textAlign: 'justify' }) ? 'bg-accent' : ''}
+            className={`h-8 w-8 p-0 ${editor?.isActive({ textAlign: 'justify' }) ? 'bg-accent' : ''}`}
           >
-            <AlignJustify className="h-4 w-4" />
+            <AlignJustify className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
+
+          <div className="w-px h-6 bg-border hidden sm:block" />
+
+          {/* Text Colors */}
+          <div className="flex items-center gap-1">
+            {textColors.map((color) => (
+              <button
+                key={color}
+                onClick={() => editor?.chain().focus().setColor(color).run()}
+                className={`h-5 w-5 rounded-full border-2 transition-transform hover:scale-110 ${
+                  editor?.getAttributes('textStyle').color === color ? 'border-foreground scale-110' : 'border-border'
+                }`}
+                style={{ backgroundColor: color }}
+                aria-label={`Set text color to ${color}`}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="flex-1 min-h-0 border border-border rounded-lg overflow-auto bg-background">
