@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, FileText, Trash2 } from 'lucide-react';
+import { X, Upload, Download, Bold, Italic, List, ListOrdered, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, FileText, Trash2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -31,16 +31,7 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-      }),
+      StarterKit,
       Underline,
       TextStyle,
       Color,
@@ -145,9 +136,6 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="text-xl font-semibold">📝 Document Editor</h2>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={handleExport}>
-            <Download className="h-5 w-5" />
-          </Button>
           <label htmlFor="import-doc">
             <Button variant="ghost" size="icon" asChild>
               <span>
@@ -162,6 +150,9 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
               className="hidden"
             />
           </label>
+          <Button variant="ghost" size="icon" onClick={handleExport}>
+            <Download className="h-5 w-5" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
@@ -176,9 +167,12 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
             onChange={(e) => setTitle(e.target.value)}
             className="flex-1 h-9"
           />
+          <Button variant="outline" size="sm" onClick={handleSave} className="h-9 w-9 p-0">
+            <Save className="h-4 w-4" />
+          </Button>
           <Sheet open={showNotes} onOpenChange={setShowNotes}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 h-9">
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">My Notes</span>
               </Button>
@@ -372,10 +366,6 @@ const NotesEditor = ({ onClose }: NotesEditorProps) => {
         <div className="flex-1 min-h-0 border border-border rounded-lg overflow-auto bg-background">
           <EditorContent editor={editor} />
         </div>
-
-        <Button onClick={handleSave} className="w-full btn-glow">
-          Save Document
-        </Button>
       </div>
     </div>
   );
