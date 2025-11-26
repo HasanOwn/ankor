@@ -26,6 +26,7 @@ const NotesEditor = ({
   const [currentDoc, setCurrentDoc] = useState<Document | null>(null);
   const [title, setTitle] = useState('');
   const [showNotes, setShowNotes] = useState(false);
+  const [viewDoc, setViewDoc] = useState<Document | null>(null);
   const textColors = ['#000000', '#FF0000', '#0000FF', '#00FF00', '#FF6B00'];
   const editor = useEditor({
     extensions: [StarterKit, Underline, TextStyle, Color, FontFamily.configure({
@@ -169,7 +170,7 @@ const NotesEditor = ({
                 <div className="flex flex-col gap-2">
                   {documents.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">No documents yet</p> : documents.map(doc => <div key={doc.id} className="p-3 border border-border rounded-lg hover:bg-accent transition-colors">
                         <div className="flex items-start justify-between gap-2">
-                          <button onClick={() => loadDocument(doc)} className="flex-1 text-left">
+                          <button onClick={() => setViewDoc(doc)} className="flex-1 text-left">
                             <p className="font-medium text-sm">{doc.title}</p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(doc.updatedAt).toLocaleDateString()}
@@ -236,10 +237,10 @@ const NotesEditor = ({
           <div className="w-px h-6 bg-border hidden sm:block" />
 
           {/* Lists */}
-          <Button variant="ghost" size="sm" onClick={() => editor?.chain().focus().toggleList('bulletList', 'listItem').run()} className={`h-8 w-8 p-0 ${editor?.isActive('bulletList') ? 'bg-accent' : ''}`}>
+          <Button variant="ghost" size="sm" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={`h-8 w-8 p-0 ${editor?.isActive('bulletList') ? 'bg-accent' : ''}`}>
             <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => editor?.chain().focus().toggleList('orderedList', 'listItem').run()} className={`h-8 w-8 p-0 ${editor?.isActive('orderedList') ? 'bg-accent' : ''}`}>
+          <Button variant="ghost" size="sm" onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={`h-8 w-8 p-0 ${editor?.isActive('orderedList') ? 'bg-accent' : ''}`}>
             <ListOrdered className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
 
@@ -280,6 +281,42 @@ const NotesEditor = ({
         <div className="flex-1 min-h-0 border border-border rounded-lg overflow-auto bg-background">
           <EditorContent editor={editor} />
         </div>
+
+        {viewDoc && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+            <div className="bg-card border border-border rounded-3xl shadow-2xl max-w-3xl w-full mx-4 max-h-[80vh] flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <div>
+                  <h3 className="text-lg font-semibold">{viewDoc.title}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Last updated {new Date(viewDoc.updatedAt).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      loadDocument(viewDoc);
+                      setViewDoc(null);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setViewDoc(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <ScrollArea className="flex-1">
+                <div
+                  className="prose prose-sm dark:prose-invert max-w-none px-6 py-4"
+                  dangerouslySetInnerHTML={{ __html: viewDoc.content }}
+                />
+              </ScrollArea>
+            </div>
+          </div>
+        )}
       </div>
     </div>;
 };

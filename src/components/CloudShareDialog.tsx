@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Cloud, Upload, Search, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { VocabSet } from '@/types/word';
+import { VocabSet, Document } from '@/types/word';
 import { toast } from 'sonner';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
   const [isSearching, setIsSearching] = useState(false);
   const [selectedSet, setSelectedSet] = useState<string>('');
   const [open, setOpen] = useState(false);
+  const [documents, setDocuments] = useLocalStorage<Document[]>('my-documents', []);
 
   const handleUpload = async () => {
     if (!username.trim()) {
@@ -75,6 +77,40 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
     }
   };
 
+  const handleUploadNotes = async () => {
+    if (!username.trim()) {
+      toast.error('Please enter your username');
+      return;
+    }
+
+    if (!documents.length) {
+      toast.error('You have no notes to upload');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { error } = await supabase
+        .from('vocab_sets')
+        .insert([
+          {
+            username: username.trim().toLowerCase(),
+            set_name: 'My Notes',
+            data: documents as any,
+          },
+        ]);
+
+      if (error) throw error;
+
+      toast.success('☁️ Your notes uploaded successfully!');
+    } catch (error) {
+      console.error('Upload notes error:', error);
+      toast.error('Failed to upload notes. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSearch = async () => {
     if (!searchUsername.trim()) {
       toast.error('Please enter a username to search');
@@ -106,6 +142,41 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
     }
   };
 
+  const isNotesCloudSet = (cloudSet: CloudSet) => {
+    return Array.isArray(cloudSet.data) && cloudSet.data.length > 0 && cloudSet.data[0]?.title && cloudSet.data[0]?.content;
+  };
+
+  const importNotesFromCloud = (cloudSet: CloudSet) => {
+    try {
+      const cloudDocs = (cloudSet.data || []) as Document[];
+      if (!Array.isArray(cloudDocs) || cloudDocs.length === 0) {
+        toast.error('No notes found in this item');
+        return;
+      }
+
+      const existingTitles = new Set(documents.map((d) => d.title.toLowerCase()));
+      const newDocs = cloudDocs
+        .filter((doc) => !existingTitles.has(doc.title.toLowerCase()))
+        .map((doc) => ({
+          ...doc,
+          id: doc.id || crypto.randomUUID(),
+          createdAt: doc.createdAt || Date.now(),
+          updatedAt: doc.updatedAt || Date.now(),
+        }));
+
+      if (newDocs.length === 0) {
+        toast.info('All notes are already in your collection');
+        return;
+      }
+
+      setDocuments([...documents, ...newDocs]);
+      toast.success(`Added ${newDocs.length} note(s) from "${cloudSet.set_name}"`);
+    } catch (error) {
+      console.error('Import notes error:', error);
+      toast.error('Failed to import notes');
+    }
+  };
+
   const handleImportSet = (cloudSet: CloudSet) => {
     try {
       const newSet: VocabSet = {
@@ -124,12 +195,18 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
 
   const handleImportAll = () => {
     try {
-      const newSets: VocabSet[] = searchResults.map(cloudSet => ({
+      const setCloudItems = searchResults.filter((cloudSet) => !isNotesCloudSet(cloudSet));
+      const newSets: VocabSet[] = setCloudItems.map(cloudSet => ({
         id: `set-${Date.now()}-${Math.random()}`,
         name: cloudSet.set_name,
         words: cloudSet.data,
         createdAt: Date.now()
       }));
+
+      if (newSets.length === 0) {
+        toast.info('No new sets to import');
+        return;
+      }
 
       onImport(newSets);
       toast.success(`Added all ${newSets.length} set(s)!`);
@@ -207,6 +284,31 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
                 </>
               )}
             </Button>
+
+            <div className="pt-4 border-t border-border space-y-2">
+              <Label>Upload All Notes</Label>
+              <p className="text-xs text-muted-foreground">
+                Upload your "My Notes" documents so you can download them on another device.
+              </p>
+              <Button
+                onClick={handleUploadNotes}
+                disabled={isUploading || !username || !documents.length}
+                variant="outline"
+                className="w-full"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Notes ({documents.length})
+                  </>
+                )}
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="search" className="space-y-4">
@@ -242,27 +344,32 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
 
                 <ScrollArea className="h-[300px] rounded-md border p-4">
                   <div className="space-y-2">
-                    {searchResults.map((cloudSet) => (
-                      <div
-                        key={cloudSet.id}
-                        className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                      >
-                        <div>
-                          <p className="font-medium">{cloudSet.set_name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {cloudSet.data?.length || 0} words
-                          </p>
-                        </div>
-                        <Button
-                          onClick={() => handleImportSet(cloudSet)}
-                          variant="ghost"
-                          size="sm"
+                    {searchResults.map((cloudSet) => {
+                      const isNotes = isNotesCloudSet(cloudSet);
+                      const itemCount = Array.isArray(cloudSet.data) ? cloudSet.data.length : 0;
+
+                      return (
+                        <div
+                          key={cloudSet.id}
+                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                         >
-                          <Download className="h-4 w-4 mr-2" />
-                          Add
-                        </Button>
-                      </div>
-                    ))}
+                          <div>
+                            <p className="font-medium">{cloudSet.set_name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {itemCount} {isNotes ? 'notes' : 'words'}
+                            </p>
+                          </div>
+                          <Button
+                            onClick={() => (isNotes ? importNotesFromCloud(cloudSet) : handleImportSet(cloudSet))}
+                            variant="ghost"
+                            size="sm"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            {isNotes ? 'Add Notes' : 'Add'}
+                          </Button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               </div>
