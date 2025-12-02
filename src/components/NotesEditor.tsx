@@ -285,8 +285,8 @@ const NotesEditor = ({
 
         {viewDoc && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-            <div className="bg-card border border-border rounded-3xl shadow-2xl max-w-3xl w-full mx-4 max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="bg-card border border-border rounded-3xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div>
                   <h3 className="text-lg font-semibold">{viewDoc.title}</h3>
                   <p className="text-xs text-muted-foreground">
@@ -309,12 +309,12 @@ const NotesEditor = ({
                   </Button>
                 </div>
               </div>
-              <ScrollArea className="flex-1 max-w-full overflow-x-hidden">
+              <div className="flex-1 w-full max-h-[78vh] overflow-y-auto overflow-x-hidden px-6 py-5">
                 <div
-                  className="prose prose-sm dark:prose-invert max-w-none p-4 break-words whitespace-pre-wrap"
+                  className="prose prose-sm dark:prose-invert max-w-none break-words whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{ __html: viewDoc.content }}
                 />
-              </ScrollArea>
+              </div>
             </div>
           </div>
         )}
