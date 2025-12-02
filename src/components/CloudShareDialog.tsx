@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Cloud, Upload, Search, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { VocabSet, Document } from '@/types/word';
@@ -40,6 +40,19 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
   const [selectedSet, setSelectedSet] = useState<string>('');
   const [open, setOpen] = useState(false);
   const [documents, setDocuments] = useLocalStorage<Document[]>('my-documents', []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    try {
+      const item = window.localStorage.getItem('my-documents');
+      if (item) {
+        setDocuments(JSON.parse(item));
+      }
+    } catch (error) {
+      console.error('Error syncing notes from localStorage:', error);
+    }
+  }, [open, setDocuments]);
 
   const handleUpload = async () => {
     if (!username.trim()) {

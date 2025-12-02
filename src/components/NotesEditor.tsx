@@ -37,7 +37,8 @@ const NotesEditor = ({
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[400px] p-4'
+        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[400px] p-4',
+        spellcheck: 'false'
       }
     }
   });
@@ -308,9 +309,9 @@ const NotesEditor = ({
                   </Button>
                 </div>
               </div>
-              <ScrollArea className="flex-1">
+              <ScrollArea className="flex-1 max-w-full overflow-x-hidden">
                 <div
-                  className="prose prose-sm dark:prose-invert max-w-none px-6 py-4"
+                  className="prose prose-sm dark:prose-invert max-w-none p-4 break-words whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{ __html: viewDoc.content }}
                 />
               </ScrollArea>
