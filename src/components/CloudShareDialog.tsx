@@ -65,22 +65,50 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
       return;
     }
 
-    const setToUpload = vocabSets.find(s => s.id === selectedSet);
+    const setToUpload = vocabSets.find((s) => s.id === selectedSet);
     if (!setToUpload) return;
+
+    const cleanedUsername = username.trim().toLowerCase();
 
     setIsUploading(true);
     try {
-      const { error } = await supabase
+      // Check if a set with the same name already exists for this user
+      const { data: existing, error: fetchError } = await supabase
         .from('vocab_sets')
-        .insert([{
-          username: username.trim().toLowerCase(),
-          set_name: setToUpload.name,
-          data: setToUpload.words as any
-        }]);
+        .select('id')
+        .eq('username', cleanedUsername)
+        .eq('set_name', setToUpload.name)
+        .limit(1)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
 
-      toast.success(`☁️ "${setToUpload.name}" uploaded successfully!`);
+      if (existing) {
+        // Update existing cloud set instead of creating a duplicate
+        const { error: updateError } = await supabase
+          .from('vocab_sets')
+          .update({
+            data: setToUpload.words as any,
+            created_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+
+        if (updateError) throw updateError;
+        toast.success(`☁️ "${setToUpload.name}" updated in cloud!`);
+      } else {
+        // Create a new cloud set
+        const { error: insertError } = await supabase.from('vocab_sets').insert([
+          {
+            username: cleanedUsername,
+            set_name: setToUpload.name,
+            data: setToUpload.words as any,
+          },
+        ]);
+
+        if (insertError) throw insertError;
+        toast.success(`☁️ "${setToUpload.name}" uploaded successfully!`);
+      }
+
       setSelectedSet('');
     } catch (error) {
       console.error('Upload error:', error);
@@ -101,21 +129,44 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
       return;
     }
 
+    const cleanedUsername = username.trim().toLowerCase();
+
     setIsUploading(true);
     try {
-      const { error } = await supabase
+      // Check if cloud notes already exist for this user
+      const { data: existing, error: fetchError } = await supabase
         .from('vocab_sets')
-        .insert([
+        .select('id')
+        .eq('username', cleanedUsername)
+        .eq('set_name', 'My Notes')
+        .limit(1)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+
+      if (existing) {
+        const { error: updateError } = await supabase
+          .from('vocab_sets')
+          .update({
+            data: documents as any,
+            created_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+
+        if (updateError) throw updateError;
+        toast.success('☁️ Your notes in cloud were updated!');
+      } else {
+        const { error: insertError } = await supabase.from('vocab_sets').insert([
           {
-            username: username.trim().toLowerCase(),
+            username: cleanedUsername,
             set_name: 'My Notes',
             data: documents as any,
           },
         ]);
 
-      if (error) throw error;
-
-      toast.success('☁️ Your notes uploaded successfully!');
+        if (insertError) throw insertError;
+        toast.success('☁️ Your notes uploaded successfully!');
+      }
     } catch (error) {
       console.error('Upload notes error:', error);
       toast.error('Failed to upload notes. Please try again.');
@@ -140,12 +191,23 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
 
       if (error) throw error;
 
-      setSearchResults(data || []);
+      const allItems = (data || []) as CloudSet[];
+      const uniqueMap = new Map<string, CloudSet>();
+
+      for (const item of allItems) {
+        const key = `${item.username}-${item.set_name}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, item);
+        }
+      }
+
+      const uniqueResults = Array.from(uniqueMap.values());
+      setSearchResults(uniqueResults);
       
-      if (!data || data.length === 0) {
+      if (uniqueResults.length === 0) {
         toast.info(`No sets found for "${searchUsername}"`);
       } else {
-        toast.success(`📚 Found ${data.length} set(s) from ${searchUsername}!`);
+        toast.success(`📚 Found ${uniqueResults.length} set(s) from ${searchUsername}!`);
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -154,7 +216,6 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
       setIsSearching(false);
     }
   };
-
   const isNotesCloudSet = (cloudSet: CloudSet) => {
     return Array.isArray(cloudSet.data) && cloudSet.data.length > 0 && cloudSet.data[0]?.title && cloudSet.data[0]?.content;
   };
