@@ -22,14 +22,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-// Zod schema for validating imported word data
+// Zod schema for validating imported word data (legacy field names kept for compatibility:
+// korean = term, uzbek = translation, romanization = pronunciation)
 const wordSchema = z.object({
   set: z.string().trim().max(100).optional(),
-  korean: z.string().trim().min(1, "Korean text is required").max(200, "Korean text too long"),
-  uzbek: z.string().trim().min(1, "Uzbek text is required").max(200, "Uzbek text too long"),
-  romanization: z.string().trim().min(1, "Romanization is required").max(200, "Romanization too long"),
-  example: z.string().trim().max(500, "Example too long").optional(),
-  meaning: z.string().trim().max(200, "Meaning too long").optional()
+  korean: z.string().trim().min(1, "Word/term is required").max(200),
+  uzbek: z.string().trim().min(1, "Translation is required").max(200),
+  romanization: z.string().trim().max(200).optional().default(''),
+  example: z.string().trim().max(500).optional(),
+  meaning: z.string().trim().max(200).optional(),
+  category: z.string().trim().max(80).optional(),
 });
 
 const importSchema = z.array(wordSchema).min(1, "Must have at least one word").max(500, "Cannot import more than 500 words at once");
@@ -37,19 +39,22 @@ const importSchema = z.array(wordSchema).min(1, "Must have at least one word").m
 const vocabSetSchema = z.object({
   id: z.string().min(1),
   name: z.string().trim().min(1).max(100),
+  language: z.string().optional(),
   words: z.array(z.object({
     id: z.number(),
     set: z.string().optional(),
     korean: z.string().min(1),
     uzbek: z.string().min(1),
-    romanization: z.string().min(1),
+    romanization: z.string().optional().default(''),
     meaning: z.string().optional(),
     example: z.string().optional(),
+    category: z.string().optional(),
     createdAt: z.number(),
-    isKnown: z.boolean().optional()
+    isKnown: z.boolean().optional(),
   })),
-  createdAt: z.number()
-}).strict();
+  documents: z.array(z.any()).optional(),
+  createdAt: z.number(),
+});
 
 const vocabSetsSchema = z.array(vocabSetSchema);
 
@@ -65,7 +70,7 @@ const Settings = () => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `korean-cards-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `vocab-sets-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
     toast.success('Sets exported successfully! ✅');
@@ -114,11 +119,12 @@ const Settings = () => {
         set: item.set || setName,
         korean: item.korean,
         uzbek: item.uzbek,
-        romanization: item.romanization,
+        romanization: item.romanization || '',
         meaning: item.meaning || item.uzbek,
         example: item.example || '',
+        category: item.category,
         createdAt: Date.now(),
-        isKnown: false
+        isKnown: false,
       }));
 
       const newSet: VocabSet = {
@@ -203,7 +209,7 @@ const Settings = () => {
               <Textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                placeholder='[{"set": "Vocab 1", "uzbek": "Davlat", "korean": "나라", "romanization": "nara"}]'
+                placeholder='[{"set": "My Set", "korean": "term", "uzbek": "translation", "romanization": "optional"}]'
                 className="min-h-[120px] font-mono text-sm"
               />
               <Button
