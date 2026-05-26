@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, BookOpen, Trash2, Edit, CheckCircle2 } from 'lucide-react';
+import { Plus, BookOpen, Trash2, Edit, CheckCircle2, Library, Book } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import StatsBox from '@/components/StatsBox';
@@ -30,17 +30,17 @@ const Home = () => {
     toast.success(`${setName} deleted`);
   };
 
-  const handleCreateSet = (name: string) => {
+  const handleCreateSet = (name: string, language?: string) => {
     const newSet: VocabSet = {
       id: Date.now().toString(),
       name,
       words: [],
+      language,
       createdAt: Date.now()
     };
     const updatedSets = [...vocabSets, newSet];
     setVocabSets(updatedSets);
     toast.success(`${name} created!`);
-    // Small delay to ensure localStorage is updated before navigation
     setTimeout(() => {
       navigate(`/words/${newSet.id}`);
     }, 100);
