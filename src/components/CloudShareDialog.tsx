@@ -207,7 +207,7 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
       if (uniqueResults.length === 0) {
         toast.info(`No sets found for "${searchUsername}"`);
       } else {
-        toast.success(`📚 Found ${uniqueResults.length} set(s) from ${searchUsername}!`);
+        toast.success(`Found ${uniqueResults.length} set(s) from ${searchUsername}`);
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -408,7 +408,7 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
-                    📚 {searchResults.length} set(s) found from {searchUsername}
+                    {searchResults.length} set(s) found from {searchUsername}
                   </p>
                   <Button onClick={handleImportAll} variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />

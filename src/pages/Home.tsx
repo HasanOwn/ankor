@@ -127,7 +127,7 @@ const Home = () => {
           <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
             <StatsBox label="Total Words" value={totalWords} icon={<BookOpen className="h-8 w-8" />} />
             <StatsBox label="Learned" value={totalLearned} icon={<CheckCircle2 className="h-8 w-8 text-success" />} />
-            <StatsBox label="Total Sets" value={totalSets} icon={<span className="text-3xl">📚</span>} />
+            <StatsBox label="Total Sets" value={totalSets} icon={<Library className="h-8 w-8" />} />
           </motion.div>
 
           {/* Vocab Sets List */}
@@ -140,7 +140,7 @@ const Home = () => {
                 return <div key={set.id} className="flex items-center gap-3 p-4 bg-card border border-border rounded-xl hover:bg-accent/50 transition-colors">
                   <button onClick={() => navigate(`/study/${set.id}`)} className="flex-1 text-left">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">📘</span>
+                      <Book className="h-6 w-6 text-primary" />
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{set.name}</h3>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">

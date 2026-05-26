@@ -92,10 +92,11 @@ const StudyMode = () => {
           </div>
 
           {/* Flashcard */}
-          <Flashcard 
-            word={currentWord} 
+          <Flashcard
+            word={currentWord}
             isKnown={isKnown}
             onToggleKnown={toggleKnown}
+            language={currentSet?.language}
           />
 
           {/* Controls */}
