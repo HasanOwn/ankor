@@ -55,7 +55,7 @@ const Search = ({ vocabSets, onClose }: SearchProps) => {
               autoFocus
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by Korean, Uzbek, or Romanization..."
+              placeholder="Search words, translations, or pronunciation..."
               className="pl-10 h-12 text-base"
             />
           </div>

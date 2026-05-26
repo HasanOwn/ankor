@@ -8,27 +8,23 @@ interface FlashcardProps {
   word: Word;
   isKnown?: boolean;
   onToggleKnown?: () => void;
+  language?: string;
 }
 
-const Flashcard = ({ word, isKnown, onToggleKnown }: FlashcardProps) => {
+const Flashcard = ({ word, isKnown, onToggleKnown, language }: FlashcardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
     if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech
       window.speechSynthesis.cancel();
-      
       const utterance = new SpeechSynthesisUtterance(word.korean);
-      utterance.lang = 'ko-KR';
+      if (language) utterance.lang = language;
       utterance.rate = 0.9;
-      
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
-      
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -48,14 +44,14 @@ const Flashcard = ({ word, isKnown, onToggleKnown }: FlashcardProps) => {
           style={{ backfaceVisibility: "hidden" }}
         >
           <div className="relative w-full flex items-center justify-center mb-4">
-            <div className="text-6xl font-bold">{word.korean}</div>
+            <div className="text-6xl font-bold text-center">{word.korean}</div>
             <button
               onClick={handleSpeak}
               className="absolute -right-4 top-0 p-2 rounded-full hover:bg-muted transition-colors"
-              aria-label="Pronounce Korean word"
+              aria-label="Pronounce word"
             >
-              <Volume2 
-                className={`h-6 w-6 ${isSpeaking ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} 
+              <Volume2
+                className={`h-6 w-6 ${isSpeaking ? 'text-primary animate-pulse' : 'text-muted-foreground'}`}
               />
             </button>
           </div>
@@ -65,21 +61,18 @@ const Flashcard = ({ word, isKnown, onToggleKnown }: FlashcardProps) => {
         {/* Back */}
         <div
           className="absolute inset-0 bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center backface-hidden"
-          style={{ 
-            backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)"
-          }}
+          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
           <div className="space-y-4 text-center max-w-md">
             {word.uzbek && (
               <div className="bg-muted/30 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground mb-1">Uzbek</p>
+                <p className="text-sm text-muted-foreground mb-1">Translation</p>
                 <p className="text-2xl font-semibold">{word.uzbek}</p>
               </div>
             )}
             {word.romanization && (
               <div className="bg-muted/30 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground mb-1">Romanization</p>
+                <p className="text-sm text-muted-foreground mb-1">Pronunciation</p>
                 <p className="text-xl">{word.romanization}</p>
               </div>
             )}
@@ -97,20 +90,16 @@ const Flashcard = ({ word, isKnown, onToggleKnown }: FlashcardProps) => {
         </div>
       </motion.div>
 
-      {/* Mark as Learned Button */}
       {onToggleKnown && (
         <div className="flex justify-center">
           <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleKnown();
-            }}
+            onClick={(e) => { e.stopPropagation(); onToggleKnown(); }}
             variant={isKnown ? "default" : "outline"}
             className="btn-glow"
             size="lg"
           >
             <CheckCircle2 className={`mr-2 h-5 w-5 ${isKnown ? 'fill-current' : ''}`} />
-            {isKnown ? 'Learned ✓' : 'Mark as Learned'}
+            {isKnown ? 'Learned' : 'Mark as Learned'}
           </Button>
         </div>
       )}

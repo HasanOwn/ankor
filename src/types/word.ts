@@ -1,11 +1,14 @@
 export interface Word {
   id: number;
   set?: string;
+  // Storage uses legacy field names for backward compatibility:
+  // `korean` = front/term, `uzbek` = back/translation, `romanization` = pronunciation
   korean: string;
   uzbek: string;
   romanization: string;
   meaning?: string;
   example?: string;
+  category?: string;
   createdAt: number;
   isKnown?: boolean;
 }
@@ -23,6 +26,7 @@ export interface VocabSet {
   name: string;
   words: Word[];
   documents?: Document[];
+  language?: string; // BCP-47 code for pronunciation, e.g. "ko-KR", "en-US"
   createdAt: number;
 }
 
