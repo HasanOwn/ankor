@@ -12,32 +12,31 @@ interface WordFormProps {
 }
 
 const WordForm = ({ word, onSave, onCancel }: WordFormProps) => {
-  const [korean, setKorean] = useState(word?.korean || '');
-  const [uzbek, setUzbek] = useState(word?.uzbek || '');
-  const [romanization, setRomanization] = useState(word?.romanization || '');
+  const [term, setTerm] = useState(word?.korean || '');
+  const [translation, setTranslation] = useState(word?.uzbek || '');
+  const [pronunciation, setPronunciation] = useState(word?.romanization || '');
   const [example, setExample] = useState(word?.example || '');
 
   useEffect(() => {
     if (word) {
-      setKorean(word.korean);
-      setUzbek(word.uzbek);
-      setRomanization(word.romanization);
+      setTerm(word.korean);
+      setTranslation(word.uzbek);
+      setPronunciation(word.romanization);
       setExample(word.example || '');
     }
   }, [word]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!korean.trim() || !uzbek.trim() || !romanization.trim()) {
-      return;
-    }
+    if (!term.trim() || !translation.trim()) return;
     onSave({
       set: word?.set,
-      korean: korean.trim(),
-      uzbek: uzbek.trim(),
-      romanization: romanization.trim(),
+      korean: term.trim(),
+      uzbek: translation.trim(),
+      romanization: pronunciation.trim(),
       example: example.trim() || undefined,
-      meaning: uzbek.trim(),
+      meaning: translation.trim(),
+      category: word?.category,
       isKnown: word?.isKnown || false,
     });
   };
@@ -45,48 +44,43 @@ const WordForm = ({ word, onSave, onCancel }: WordFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="korean">Korean (한글) *</Label>
+        <Label htmlFor="term">Word / Term *</Label>
         <Input
-          id="korean"
-          value={korean}
-          onChange={(e) => setKorean(e.target.value)}
-          placeholder="나라"
+          id="term"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
           required
           className="bg-secondary border-border"
         />
       </div>
-      
+
       <div>
-        <Label htmlFor="uzbek">Uzbek Translation *</Label>
+        <Label htmlFor="translation">Translation *</Label>
         <Input
-          id="uzbek"
-          value={uzbek}
-          onChange={(e) => setUzbek(e.target.value)}
-          placeholder="Davlat"
+          id="translation"
+          value={translation}
+          onChange={(e) => setTranslation(e.target.value)}
           required
           className="bg-secondary border-border"
         />
       </div>
-      
+
       <div>
-        <Label htmlFor="romanization">Romanization *</Label>
+        <Label htmlFor="pronunciation">Pronunciation (optional)</Label>
         <Input
-          id="romanization"
-          value={romanization}
-          onChange={(e) => setRomanization(e.target.value)}
-          placeholder="nara"
-          required
+          id="pronunciation"
+          value={pronunciation}
+          onChange={(e) => setPronunciation(e.target.value)}
           className="bg-secondary border-border"
         />
       </div>
-      
+
       <div>
         <Label htmlFor="example">Example Sentence (optional)</Label>
         <Textarea
           id="example"
           value={example}
           onChange={(e) => setExample(e.target.value)}
-          placeholder="저는 학교에 가요"
           className="bg-secondary border-border"
         />
       </div>
