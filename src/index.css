@@ -2,83 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* AnKor design system — semantic tokens only. All colors in HSL. */
 
 @layer base {
   :root {
-    /* Light mode - soft eye-care colors */
-    --background: 40 20% 97%;
-    --foreground: 0 0% 10%;
+    /* Surfaces */
+    --background: 224 100% 97%;        /* #F0F4FF light blue-gray */
+    --foreground: 224 43% 17%;         /* #1A2340 text primary */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 224 43% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 224 43% 17%;
 
-    --primary: 210 50% 50%;
+    /* Brand */
+    --primary: 222 91% 63%;            /* #4A7CF7 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 15% 90%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 224 100% 95%;
+    --secondary-foreground: 224 43% 17%;
 
-    --muted: 40 15% 92%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 224 60% 95%;
+    --muted-foreground: 218 14% 60%;   /* #8A94A6 */
 
-    --accent: 40 20% 88%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 224 100% 95%;
+    --accent-foreground: 224 43% 17%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 11 87% 68%;         /* #F4836A coral */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 210 50% 50%;
+    --border: 224 40% 92%;
+    --input: 224 40% 92%;
+    --ring: 222 91% 63%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --glow: 210 50% 60%;
-    
-    --success: 142 71% 45%;
+    --success: 148 41% 48%;            /* #4CAF7D */
     --success-foreground: 0 0% 100%;
+
+    /* Status colors */
+    --due: 11 87% 68%;                 /* coral-orange */
+    --due-foreground: 0 0% 100%;
+    --studied: 214 89% 66%;            /* #5B9BF5 medium blue */
+    --studied-foreground: 0 0% 100%;
+
+    /* Badge tokens */
+    --badge-new-bg: 224 100% 95%;      /* #E8EEFF */
+    --badge-new-fg: 222 91% 63%;       /* #4A7CF7 */
+    --badge-learning-bg: 14 100% 96%;  /* #FFF0EC */
+    --badge-learning-fg: 11 87% 68%;   /* #F4836A */
+    --badge-review-bg: 140 41% 92%;    /* #E8F5EE */
+    --badge-review-fg: 148 41% 48%;    /* #4CAF7D */
+
+    --glow: 222 91% 63%;
   }
 
   .dark {
-    /* Dark mode - deep charcoal eye-care colors */
-    --background: 220 15% 8%;
+    --background: 224 43% 10%;
     --foreground: 0 0% 95%;
 
-    --card: 220 15% 11%;
+    --card: 224 35% 14%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 220 15% 11%;
+    --popover: 224 35% 14%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 210 50% 60%;
-    --primary-foreground: 0 0% 10%;
+    --primary: 222 91% 63%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 16%;
+    --secondary: 224 25% 20%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 220 10% 20%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 224 25% 18%;
+    --muted-foreground: 218 14% 70%;
 
-    --accent: 220 12% 18%;
+    --accent: 224 25% 20%;
     --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 11 87% 68%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 22%;
-    --input: 220 10% 22%;
-    --ring: 210 50% 50%;
+    --border: 224 25% 22%;
+    --input: 224 25% 22%;
+    --ring: 222 91% 63%;
 
-    --glow: 210 50% 70%;
-    
-    --success: 142 71% 45%;
+    --success: 148 41% 48%;
     --success-foreground: 0 0% 100%;
+
+    --due: 11 87% 68%;
+    --due-foreground: 0 0% 100%;
+    --studied: 214 89% 66%;
+    --studied-foreground: 0 0% 100%;
+
+    --badge-new-bg: 222 50% 22%;
+    --badge-new-fg: 222 91% 75%;
+    --badge-learning-bg: 11 40% 22%;
+    --badge-learning-fg: 11 87% 78%;
+    --badge-review-bg: 148 30% 18%;
+    --badge-review-fg: 148 41% 65%;
+
+    --glow: 222 91% 63%;
   }
 }
 
@@ -88,10 +112,7 @@ All colors MUST be HSL.
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-
-  *::-webkit-scrollbar {
-    display: none;
-  }
+  *::-webkit-scrollbar { display: none; }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
@@ -100,10 +121,9 @@ All colors MUST be HSL.
 
 @layer components {
   .btn-glow {
-    @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-[1.02];
+    @apply transition-all duration-300 hover:scale-[1.02];
   }
-  
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:translate-y-[-2px];
+  .card-elev {
+    box-shadow: 0 2px 12px rgba(26, 35, 64, 0.06);
   }
 }

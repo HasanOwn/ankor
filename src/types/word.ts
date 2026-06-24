@@ -1,3 +1,5 @@
+export type CardState = 'new' | 'learning' | 'review';
+
 export interface Word {
   id: number;
   set?: string;
@@ -11,6 +13,12 @@ export interface Word {
   category?: string;
   createdAt: number;
   isKnown?: boolean;
+  // SRS fields (SM-2 simplified). All optional for backward compat.
+  interval?: number;   // days
+  ease?: number;       // default 2.5, min 1.3
+  due?: number;        // epoch ms when card is next due
+  lapses?: number;
+  state?: CardState;
 }
 
 export interface Document {
