@@ -285,10 +285,10 @@ const Home = () => {
 
           <button
             onClick={() => setFabOpen(o => !o)}
-            className="absolute left-1/2 -translate-x-1/2 -top-7 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
             aria-label="Add"
           >
-            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }}>
+            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} className="flex items-center justify-center">
               {fabOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
             </motion.div>
           </button>
