@@ -59,51 +59,51 @@
   }
 
   .dark {
-    /* Neutral black/grey — no blue tint */
-    --background: 0 0% 7%;             /* #121212 */
-    --foreground: 0 0% 95%;
+    /* Soft neutral grey — light grey surfaces, not pure black */
+    --background: 0 0% 16%;
+    --foreground: 0 0% 96%;
 
-    --card: 0 0% 11%;                  /* #1C1C1C */
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 22%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 11%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 22%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 0 0% 95%;               /* white-ish accent for neutral dark */
-    --primary-foreground: 0 0% 10%;
+    --primary: 0 0% 92%;
+    --primary-foreground: 0 0% 14%;
 
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 0 0% 26%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 62%;
+    --muted: 0 0% 26%;
+    --muted-foreground: 0 0% 72%;
 
-    --accent: 0 0% 16%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 0 0% 28%;
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 0 70% 55%;
+    --destructive: 0 65% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 60%;
+    --border: 0 0% 32%;
+    --input: 0 0% 32%;
+    --ring: 0 0% 70%;
 
-    --success: 142 35% 50%;
+    --success: 142 30% 55%;
     --success-foreground: 0 0% 100%;
 
-    --due: 14 75% 60%;
+    --due: 14 65% 62%;
     --due-foreground: 0 0% 100%;
-    --studied: 0 0% 70%;
-    --studied-foreground: 0 0% 10%;
+    --studied: 0 0% 80%;
+    --studied-foreground: 0 0% 14%;
 
-    --badge-new-bg: 0 0% 18%;
-    --badge-new-fg: 0 0% 90%;
-    --badge-learning-bg: 14 35% 20%;
-    --badge-learning-fg: 14 75% 75%;
-    --badge-review-bg: 142 20% 18%;
-    --badge-review-fg: 142 35% 70%;
+    --badge-new-bg: 0 0% 30%;
+    --badge-new-fg: 0 0% 96%;
+    --badge-learning-bg: 14 30% 32%;
+    --badge-learning-fg: 14 65% 82%;
+    --badge-review-bg: 142 18% 30%;
+    --badge-review-fg: 142 30% 80%;
 
-    --glow: 0 0% 60%;
+    --glow: 0 0% 75%;
   }
 }
 
