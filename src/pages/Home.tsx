@@ -236,12 +236,12 @@ const Home = () => {
         {fabOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-foreground/20"
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm flex items-end justify-center pb-28"
             onClick={() => setFabOpen(false)}
           >
             <motion.div
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
-              className="absolute bottom-28 left-1/2 -translate-x-1/2 bg-card rounded-2xl card-elev p-2 w-60"
+              className="bg-card rounded-2xl card-elev p-2 w-64 border border-border"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -249,14 +249,14 @@ const Home = () => {
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
               >
                 <Download className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Get shared decks</span>
+                <span className="text-sm font-medium text-foreground">Get shared decks</span>
               </button>
               <button
                 onClick={() => { setFabOpen(false); setShowCreateDialog(true); }}
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
               >
                 <FolderPlus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Create deck</span>
+                <span className="text-sm font-medium text-foreground">Create deck</span>
               </button>
               <button
                 onClick={() => {
@@ -267,7 +267,7 @@ const Home = () => {
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
               >
                 <FilePlus2 className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Create card</span>
+                <span className="text-sm font-medium text-foreground">Create card</span>
               </button>
             </motion.div>
           </motion.div>
