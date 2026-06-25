@@ -278,9 +278,9 @@ const Home = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border">
         <div className="container max-w-2xl mx-auto px-4 py-2 flex items-center justify-around relative">
           <NavItem icon={<HomeIcon className="h-5 w-5" />} label="Home" active />
-          <NavItem icon={<SearchIcon className="h-5 w-5" />} label="Browser" onClick={() => setShowSearch(true)} />
+          <NavItem icon={<SearchIcon className="h-5 w-5" />} label="Browser" onClick={() => navigate('/browser')} />
           <div className="w-14" />
-          <NavItem icon={<BarChart3 className="h-5 w-5" />} label="Insights" onClick={() => toast.info('Insights coming soon')} />
+          <NavItem icon={<BarChart3 className="h-5 w-5" />} label="Insights" onClick={() => navigate('/insights')} />
           <NavItem icon={<SettingsIcon className="h-5 w-5" />} label="Settings" onClick={() => navigate('/settings')} />
 
           <button

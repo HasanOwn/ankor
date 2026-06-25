@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import StudyMode from "./pages/StudyMode";
 import WordList from "./pages/WordList";
+import Insights from "./pages/Insights";
+import Browser from "./pages/Browser";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/study/:setId" element={<StudyMode />} />
             <Route path="/words/:setId" element={<WordList />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/browser" element={<Browser />} />
             <Route path="/add" element={<Navigate to="/settings" replace />} />
             <Route path="/words" element={<Navigate to="/" replace />} />
             <Route path="/study" element={<Navigate to="/" replace />} />

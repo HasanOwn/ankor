@@ -59,50 +59,51 @@
   }
 
   .dark {
-    --background: 224 43% 10%;
+    /* Neutral black/grey — no blue tint */
+    --background: 0 0% 7%;             /* #121212 */
     --foreground: 0 0% 95%;
 
-    --card: 224 35% 14%;
+    --card: 0 0% 11%;                  /* #1C1C1C */
     --card-foreground: 0 0% 95%;
 
-    --popover: 224 35% 14%;
+    --popover: 0 0% 11%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 222 91% 63%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 95%;               /* white-ish accent for neutral dark */
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 224 25% 20%;
+    --secondary: 0 0% 16%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 224 25% 18%;
-    --muted-foreground: 218 14% 70%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 62%;
 
-    --accent: 224 25% 20%;
+    --accent: 0 0% 16%;
     --accent-foreground: 0 0% 95%;
 
-    --destructive: 11 87% 68%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 224 25% 22%;
-    --input: 224 25% 22%;
-    --ring: 222 91% 63%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 60%;
 
-    --success: 148 41% 48%;
+    --success: 142 35% 50%;
     --success-foreground: 0 0% 100%;
 
-    --due: 11 87% 68%;
+    --due: 14 75% 60%;
     --due-foreground: 0 0% 100%;
-    --studied: 214 89% 66%;
-    --studied-foreground: 0 0% 100%;
+    --studied: 0 0% 70%;
+    --studied-foreground: 0 0% 10%;
 
-    --badge-new-bg: 222 50% 22%;
-    --badge-new-fg: 222 91% 75%;
-    --badge-learning-bg: 11 40% 22%;
-    --badge-learning-fg: 11 87% 78%;
-    --badge-review-bg: 148 30% 18%;
-    --badge-review-fg: 148 41% 65%;
+    --badge-new-bg: 0 0% 18%;
+    --badge-new-fg: 0 0% 90%;
+    --badge-learning-bg: 14 35% 20%;
+    --badge-learning-fg: 14 75% 75%;
+    --badge-review-bg: 142 20% 18%;
+    --badge-review-fg: 142 35% 70%;
 
-    --glow: 222 91% 63%;
+    --glow: 0 0% 60%;
   }
 }
 
