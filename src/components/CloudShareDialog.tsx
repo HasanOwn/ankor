@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface CloudShareDialogProps {
   vocabSets: VocabSet[];
   onImport: (sets: VocabSet[]) => void;
+  trigger?: React.ReactNode;
 }
 
 interface CloudSet {
@@ -31,7 +32,7 @@ interface CloudSet {
   created_at: string;
 }
 
-export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps) => {
+export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDialogProps) => {
   const [username, setUsername] = useState('');
   const [searchUsername, setSearchUsername] = useState('');
   const [searchResults, setSearchResults] = useState<CloudSet[]>([]);
@@ -294,10 +295,12 @@ export const CloudShareDialog = ({ vocabSets, onImport }: CloudShareDialogProps)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Cloud className="h-4 w-4 mr-2" />
-          Cloud Share
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" size="sm">
+            <Cloud className="h-4 w-4 mr-2" />
+            Cloud Share
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>

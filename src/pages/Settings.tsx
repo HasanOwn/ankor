@@ -1,40 +1,36 @@
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Download, Upload, Trash2, FileJson, Moon, Sun } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { z } from 'zod';
-import Header from '@/components/Header';
+import {
+  ChevronRight, Download, Upload, Trash2, FileJson, Moon,
+  ArrowLeft, Palette, Database, AlertTriangle, Info, ClipboardPaste,
+} from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTheme } from '@/components/ThemeProvider';
 import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import BottomNav from '@/components/BottomNav';
 
-// Zod schema for validating imported word data (legacy field names kept for compatibility:
-// korean = term, uzbek = translation, romanization = pronunciation)
 const wordSchema = z.object({
   set: z.string().trim().max(100).optional(),
-  korean: z.string().trim().min(1, "Word/term is required").max(200),
-  uzbek: z.string().trim().min(1, "Translation is required").max(200),
+  korean: z.string().trim().min(1).max(200),
+  uzbek: z.string().trim().min(1).max(200),
   romanization: z.string().trim().max(200).optional().default(''),
   example: z.string().trim().max(500).optional(),
   meaning: z.string().trim().max(200).optional(),
   category: z.string().trim().max(80).optional(),
 });
-
-const importSchema = z.array(wordSchema).min(1, "Must have at least one word").max(500, "Cannot import more than 500 words at once");
+const importSchema = z.array(wordSchema).min(1).max(500);
 
 const vocabSetSchema = z.object({
   id: z.string().min(1),
@@ -55,67 +51,98 @@ const vocabSetSchema = z.object({
   documents: z.array(z.any()).optional(),
   createdAt: z.number(),
 });
-
 const vocabSetsSchema = z.array(vocabSetSchema);
+
+const Section = ({ title, children }: { title?: string; children: React.ReactNode }) => (
+  <section className="space-y-2">
+    {title && (
+      <h2 className="px-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </h2>
+    )}
+    <div className="bg-card rounded-2xl card-elev overflow-hidden divide-y divide-border/60">
+      {children}
+    </div>
+  </section>
+);
+
+const Row = ({
+  icon, iconBg, title, subtitle, right, onClick, destructive,
+}: {
+  icon?: React.ReactNode;
+  iconBg?: string;
+  title: string;
+  subtitle?: string;
+  right?: React.ReactNode;
+  onClick?: () => void;
+  destructive?: boolean;
+}) => {
+  const Tag: any = onClick ? 'button' : 'div';
+  return (
+    <Tag
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 text-left ${onClick ? 'hover:bg-muted/50 transition-colors' : ''}`}
+    >
+      {icon && (
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg || 'bg-primary/10 text-primary'}`}>
+          {icon}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className={`text-sm font-medium truncate ${destructive ? 'text-destructive' : 'text-foreground'}`}>{title}</div>
+        {subtitle && <div className="text-xs text-muted-foreground truncate">{subtitle}</div>}
+      </div>
+      {right ?? (onClick && <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />)}
+    </Tag>
+  );
+};
 
 const Settings = () => {
   const navigate = useNavigate();
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
-  const [jsonInput, setJsonInput] = useState('');
   const { theme, setTheme } = useTheme();
+  const [jsonOpen, setJsonOpen] = useState(false);
+  const [jsonInput, setJsonInput] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const totalCards = vocabSets.reduce((a, s) => a + (s.words?.length || 0), 0);
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(vocabSets, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `vocab-sets-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
+    const blob = new Blob([JSON.stringify(vocabSets, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vocab-sets-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
     URL.revokeObjectURL(url);
-    toast.success('Sets exported successfully! ✅');
+    toast.success('Sets exported');
   };
 
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const importedData = JSON.parse(e.target?.result as string);
-        
-        // Validate the imported data structure
-        const validatedData = vocabSetsSchema.parse(importedData) as VocabSet[];
-        
-        setVocabSets(validatedData);
-        toast.success('Sets imported successfully! ✅');
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          const firstError = error.errors[0];
-          toast.error(`Invalid data: ${firstError.message}`);
-        } else if (error instanceof SyntaxError) {
-          toast.error('Invalid JSON format');
-        } else {
-          toast.error('Error importing file');
-        }
+        const validated = vocabSetsSchema.parse(JSON.parse(e.target?.result as string)) as VocabSet[];
+        setVocabSets(validated);
+        toast.success('Sets imported');
+      } catch (err) {
+        if (err instanceof z.ZodError) toast.error(`Invalid: ${err.errors[0].message}`);
+        else if (err instanceof SyntaxError) toast.error('Invalid JSON format');
+        else toast.error('Error importing file');
       }
     };
     reader.readAsText(file);
+    event.target.value = '';
   };
 
   const handleJsonImport = () => {
     try {
-      const parsedData = JSON.parse(jsonInput);
-      
-      // Validate the parsed data against schema
-      const validatedData = importSchema.parse(parsedData);
-
-      const setName = validatedData[0]?.set || `Vocab ${vocabSets.length + 1}`;
-      const setId = `set-${Date.now()}`;
-
-      const importedWords = validatedData.map((item, index) => ({
-        id: Date.now() + index,
+      const validated = importSchema.parse(JSON.parse(jsonInput));
+      const setName = validated[0]?.set || `Vocab ${vocabSets.length + 1}`;
+      const words = validated.map((item, i) => ({
+        id: Date.now() + i,
         set: item.set || setName,
         korean: item.korean,
         uzbek: item.uzbek,
@@ -126,186 +153,157 @@ const Settings = () => {
         createdAt: Date.now(),
         isKnown: false,
       }));
-
-      const newSet: VocabSet = {
-        id: setId,
-        name: setName,
-        words: importedWords,
-        createdAt: Date.now()
-      };
-
-      setVocabSets([...vocabSets, newSet]);
+      setVocabSets([...vocabSets, { id: `set-${Date.now()}`, name: setName, words, createdAt: Date.now() }]);
       setJsonInput('');
-      toast.success(`JSON imported successfully ✅ (${importedWords.length} words)`);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const firstError = error.errors[0];
-        toast.error(`Invalid data: ${firstError.message}`);
-      } else if (error instanceof SyntaxError) {
-        toast.error('Invalid JSON format');
-      } else {
-        toast.error('Error processing data');
-      }
+      setJsonOpen(false);
+      toast.success(`Imported ${words.length} words`);
+    } catch (err) {
+      if (err instanceof z.ZodError) toast.error(`Invalid: ${err.errors[0].message}`);
+      else if (err instanceof SyntaxError) toast.error('Invalid JSON format');
+      else toast.error('Error processing data');
     }
   };
 
   const handleReset = () => {
     setVocabSets([]);
-    toast.success('All data cleared! 🗑️');
+    toast.success('All data cleared');
     navigate('/');
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header showBack />
-      
-      <main className="container max-w-2xl mx-auto px-4 pt-24 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-8"
-        >
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-2">Settings</h1>
-            <p className="text-muted-foreground">
-              Manage your data and preferences
-            </p>
-          </div>
+    <div className="min-h-screen bg-background pb-28">
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
+        <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-bold text-foreground">Settings</h1>
+        </div>
+      </header>
 
-          <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
-            {/* Theme Toggle */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Appearance</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Switch between light and dark mode
-              </p>
-              <Button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                variant="outline"
-                className="w-full btn-glow"
-              >
-                {theme === 'dark' ? (
-                  <>
-                    <Sun className="mr-2 h-5 w-5" />
-                    Switch to Light Mode
-                  </>
-                ) : (
-                  <>
-                    <Moon className="mr-2 h-5 w-5" />
-                    Switch to Dark Mode
-                  </>
-                )}
-              </Button>
-            </div>
-
-            <div className="border-t border-border" />
-
-            {/* JSON Paste Import */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Paste JSON Data</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Paste JSON array to import words instantly
-              </p>
-              <Textarea
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                placeholder='[{"set": "My Set", "korean": "term", "uzbek": "translation", "romanization": "optional"}]'
-                className="min-h-[120px] font-mono text-sm"
+      <main className="container max-w-2xl mx-auto px-4 pt-2 space-y-6">
+        <Section title="Appearance">
+          <Row
+            icon={<Moon className="h-4 w-4" />}
+            iconBg="bg-primary/10 text-primary"
+            title="Dark Mode"
+            subtitle="Use a dark color palette"
+            right={
+              <Switch
+                checked={theme === 'dark'}
+                onCheckedChange={(v) => setTheme(v ? 'dark' : 'light')}
               />
-              <Button
-                onClick={handleJsonImport}
-                disabled={!jsonInput.trim()}
-                className="w-full btn-glow bg-primary text-primary-foreground mt-2"
-              >
-                <FileJson className="mr-2 h-5 w-5" />
-                Import JSON
-              </Button>
-            </div>
+            }
+          />
+          <Row
+            icon={<Palette className="h-4 w-4" />}
+            iconBg="bg-badge-learning text-badge-learning-foreground"
+            title="Theme"
+            subtitle={theme === 'dark' ? 'Dark' : 'Light'}
+          />
+        </Section>
 
-            <div className="border-t border-border" />
+        <Section title="Data">
+          <Row
+            icon={<ClipboardPaste className="h-4 w-4" />}
+            iconBg="bg-primary/10 text-primary"
+            title="Paste JSON"
+            subtitle="Quickly import words from clipboard"
+            onClick={() => setJsonOpen(true)}
+          />
+          <Row
+            icon={<Download className="h-4 w-4" />}
+            iconBg="bg-studied/20 text-studied"
+            title="Export sets"
+            subtitle={`${vocabSets.length} deck${vocabSets.length === 1 ? '' : 's'} · ${totalCards} cards`}
+            onClick={handleExport}
+          />
+          <Row
+            icon={<Upload className="h-4 w-4" />}
+            iconBg="bg-badge-review text-badge-review-foreground"
+            title="Import from file"
+            subtitle="Restore from a JSON backup"
+            onClick={() => fileRef.current?.click()}
+          />
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+        </Section>
 
-            {/* Export */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Export Words</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Download your words as a JSON file
-              </p>
-              <Button
-                onClick={handleExport}
-                disabled={vocabSets.length === 0}
-                className="w-full btn-glow bg-primary text-primary-foreground"
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Export All Sets
-              </Button>
-            </div>
+        <Section title="About">
+          <Row
+            icon={<Info className="h-4 w-4" />}
+            iconBg="bg-muted text-muted-foreground"
+            title="AnKor"
+            subtitle="Spaced repetition · v1.0"
+          />
+          <Row
+            icon={<Database className="h-4 w-4" />}
+            iconBg="bg-muted text-muted-foreground"
+            title="Storage"
+            subtitle={`${vocabSets.length} decks · ${totalCards} cards stored locally`}
+          />
+        </Section>
 
-            <div className="border-t border-border" />
-
-            {/* Import */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Import Words</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Upload a JSON file to restore your words
-              </p>
-              <label htmlFor="import-file" className="block">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full btn-glow"
-                  onClick={() => document.getElementById('import-file')?.click()}
-                >
-                  <Upload className="mr-2 h-5 w-5" />
-                  Import Words
-                </Button>
-                <input
-                  id="import-file"
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="hidden"
-                />
-              </label>
-            </div>
-
-            <div className="border-t border-border" />
-
-            {/* Reset */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Clear all data from the app (this cannot be undone)
-              </p>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    className="w-full"
-                  >
-                    <Trash2 className="mr-2 h-5 w-5" />
-                    Reset All Data
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="bg-card border-border">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-muted-foreground">
-                      This will permanently delete all your words, progress, and settings.
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-secondary">Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground">
-                      Yes, delete everything
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        </motion.div>
+        <Section title="Danger Zone">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center shrink-0">
+                  <Trash2 className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-destructive">Reset all data</div>
+                  <div className="text-xs text-muted-foreground">Permanently delete decks & progress</div>
+                </div>
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete all your decks, cards, and progress. This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground">
+                  Yes, delete everything
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </Section>
       </main>
+
+      <Dialog open={jsonOpen} onOpenChange={setJsonOpen}>
+        <DialogContent className="bg-card max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Paste JSON</DialogTitle>
+            <DialogDescription>Array of words to import as a new deck</DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={jsonInput}
+            onChange={(e) => setJsonInput(e.target.value)}
+            placeholder='[{"set":"My Set","korean":"term","uzbek":"translation"}]'
+            className="min-h-[160px] font-mono text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setJsonOpen(false)}>Cancel</Button>
+            <Button onClick={handleJsonImport} disabled={!jsonInput.trim()}>
+              <FileJson className="h-4 w-4 mr-2" /> Import
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <BottomNav active="settings" />
     </div>
   );
 };
