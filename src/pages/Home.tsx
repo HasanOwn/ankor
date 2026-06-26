@@ -2,9 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import {
-  Plus, RefreshCw, MoreVertical, ChevronDown, Eye, Pencil, SlidersHorizontal,
-  Home as HomeIcon, Search as SearchIcon, BarChart3, Settings as SettingsIcon,
-  Download, FolderPlus, FilePlus2, Trash2, X,
+  RefreshCw, ChevronDown, Eye, Pencil,
+  Search as SearchIcon, Trash2, Cloud,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -16,8 +15,8 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import Search from '@/components/Search';
-import CreateSetDialog from '@/components/CreateSetDialog';
 import { CloudShareDialog } from '@/components/CloudShareDialog';
+import BottomNav from '@/components/BottomNav';
 
 interface StudySession { date: string; cards: number; minutes: number; }
 
@@ -128,8 +127,6 @@ const Home = () => {
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [sessions] = useLocalStorage<StudySession[]>('study-sessions', []);
   const [showSearch, setShowSearch] = useState(false);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [fabOpen, setFabOpen] = useState(false);
 
   const today = new Date().toISOString().slice(0, 10);
   const todaySession = sessions.find(s => s.date === today);
@@ -139,13 +136,6 @@ const Home = () => {
     acc.due += c.due;
     return acc;
   }, { due: 0 });
-
-  const handleCreateSet = (name: string, language?: string) => {
-    const newSet: VocabSet = { id: Date.now().toString(), name, words: [], language, createdAt: Date.now() };
-    setVocabSets([...vocabSets, newSet]);
-    toast.success(`${name} created`);
-    setTimeout(() => navigate(`/words/${newSet.id}`), 100);
-  };
 
   const handleImportSets = (newSets: VocabSet[]) => {
     const existing = new Set(vocabSets.map(s => s.name.toLowerCase()));
@@ -162,18 +152,23 @@ const Home = () => {
         <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">AnKor</h1>
           <div className="flex items-center gap-1">
+            <CloudShareDialog
+              vocabSets={vocabSets}
+              onImport={handleImportSets}
+              trigger={
+                <Button variant="ghost" size="icon" aria-label="Cloud Share">
+                  <Cloud className="h-5 w-5 text-muted-foreground" />
+                </Button>
+              }
+            />
             <Button variant="ghost" size="icon" onClick={() => window.location.reload()}>
               <RefreshCw className="h-5 w-5 text-muted-foreground" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
-              <MoreVertical className="h-5 w-5 text-muted-foreground" />
             </Button>
           </div>
         </div>
       </header>
 
       {showSearch && <Search vocabSets={vocabSets} onClose={() => setShowSearch(false)} />}
-      <CreateSetDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} onCreateSet={handleCreateSet} />
 
       <main className="container max-w-2xl mx-auto px-4 pt-2 space-y-6">
         {/* Overview */}
@@ -224,90 +219,11 @@ const Home = () => {
             </div>
           )}
         </section>
-
-        {/* Cloud share floating */}
-        <div className="fixed bottom-24 left-4 z-30">
-          <CloudShareDialog vocabSets={vocabSets} onImport={handleImportSets} />
-        </div>
       </main>
 
-      {/* FAB menu */}
-      <AnimatePresence>
-        {fabOpen && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm flex items-end justify-center pb-28"
-            onClick={() => setFabOpen(false)}
-          >
-            <motion.div
-              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
-              className="bg-card rounded-2xl card-elev p-2 w-64 border border-border"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => { setFabOpen(false); navigate('/settings'); }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <Download className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Get shared decks</span>
-              </button>
-              <button
-                onClick={() => { setFabOpen(false); setShowCreateDialog(true); }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <FolderPlus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Create deck</span>
-              </button>
-              <button
-                onClick={() => {
-                  setFabOpen(false);
-                  if (vocabSets[0]) navigate(`/words/${vocabSets[0].id}`);
-                  else toast.info('Create a deck first');
-                }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <FilePlus2 className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Create card</span>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border">
-        <div className="container max-w-2xl mx-auto px-4 py-2 flex items-center justify-around relative">
-          <NavItem icon={<HomeIcon className="h-5 w-5" />} label="Home" active />
-          <NavItem icon={<SearchIcon className="h-5 w-5" />} label="Browser" onClick={() => navigate('/browser')} />
-          <div className="w-14" />
-          <NavItem icon={<BarChart3 className="h-5 w-5" />} label="Insights" onClick={() => navigate('/insights')} />
-          <NavItem icon={<SettingsIcon className="h-5 w-5" />} label="Settings" onClick={() => navigate('/settings')} />
-
-          <button
-            onClick={() => setFabOpen(o => !o)}
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-            aria-label="Add"
-          >
-            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} className="flex items-center justify-center">
-              {fabOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
-            </motion.div>
-          </button>
-        </div>
-      </nav>
+      <BottomNav active="home" />
     </div>
   );
 };
-
-const NavItem = ({
-  icon, label, active, onClick,
-}: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) => (
-  <button
-    onClick={onClick}
-    className={`flex flex-col items-center gap-0.5 px-3 py-1.5 ${active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-  >
-    {icon}
-    <span className="text-[10px] font-medium">{label}</span>
-  </button>
-);
 
 export default Home;

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import WordForm from '@/components/WordForm';
 import { toast } from 'sonner';
+import BottomNav from '@/components/BottomNav';
 
 type StateFilter = 'all' | CardState | 'due';
 
@@ -63,7 +64,8 @@ const Browser = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-screen bg-background pb-28">
+
       <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
         <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
@@ -158,6 +160,7 @@ const Browser = () => {
           )}
         </DialogContent>
       </Dialog>
+      <BottomNav active="browser" />
     </div>
   );
 };

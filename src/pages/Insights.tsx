@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet } from '@/types/word';
 import { bucketCounts } from '@/lib/srs';
+import BottomNav from '@/components/BottomNav';
 
 interface StudySession { date: string; cards: number; minutes: number; }
 
@@ -66,7 +67,8 @@ const Insights = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-screen bg-background pb-28">
+
       <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
         <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
@@ -143,6 +145,7 @@ const Insights = () => {
           </div>
         </section>
       </main>
+      <BottomNav active="insights" />
     </div>
   );
 };
