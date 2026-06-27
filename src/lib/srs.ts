@@ -27,7 +27,7 @@ export function previewIntervals(word: Word): Record<Rating, SRSPreview> {
   const isNew = !word.state || word.state === 'new' || interval === 0;
 
   const again = 10 / (24 * 60); // 10 min
-  const hard = isNew ? 1 : Math.max(1, interval * 1.2);
+  const hard = isNew ? 2 / 24 : Math.max(2 / 24, interval * 1.2);
   const good = isNew ? 1 : Math.max(1, interval * ease);
   const easy = isNew ? 4 : Math.max(1, interval * ease * 1.3);
 
