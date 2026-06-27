@@ -12,9 +12,13 @@ export interface SRSPreview {
 }
 
 function formatInterval(days: number): string {
-  if (days < 1) {
+  if (days < 1 / 24) {
     const mins = Math.max(1, Math.round(days * 24 * 60));
     return `${mins} min`;
+  }
+  if (days < 1) {
+    const hrs = Math.max(1, Math.round(days * 24));
+    return `${hrs} h`;
   }
   if (days < 30) return `${Math.round(days)} d`;
   if (days < 365) return `${(days / 30).toFixed(1)} mo`;
@@ -27,7 +31,7 @@ export function previewIntervals(word: Word): Record<Rating, SRSPreview> {
   const isNew = !word.state || word.state === 'new' || interval === 0;
 
   const again = 10 / (24 * 60); // 10 min
-  const hard = isNew ? 1 : Math.max(1, interval * 1.2);
+  const hard = isNew ? 2 / 24 : Math.max(2 / 24, interval * 1.2);
   const good = isNew ? 1 : Math.max(1, interval * ease);
   const easy = isNew ? 4 : Math.max(1, interval * ease * 1.3);
 
@@ -56,7 +60,7 @@ export function applyRating(word: Word, rating: Rating): Word {
       break;
     case 'hard':
       ease = Math.max(MIN_EASE, ease - 0.15);
-      interval = isNew ? 1 : Math.max(1, interval * 1.2);
+      interval = isNew ? 2 / 24 : Math.max(2 / 24, interval * 1.2);
       state = 'review';
       break;
     case 'good':

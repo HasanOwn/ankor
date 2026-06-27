@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import Search from '@/components/Search';
 import { CloudShareDialog } from '@/components/CloudShareDialog';
-import BottomNav from '@/components/BottomNav';
 
 interface StudySession { date: string; cards: number; minutes: number; }
 
@@ -221,7 +220,6 @@ const Home = () => {
         </section>
       </main>
 
-      <BottomNav active="home" />
     </div>
   );
 };

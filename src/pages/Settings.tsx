@@ -19,7 +19,6 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import BottomNav from '@/components/BottomNav';
 
 const wordSchema = z.object({
   set: z.string().trim().max(100).optional(),
@@ -303,7 +302,6 @@ const Settings = () => {
         </DialogContent>
       </Dialog>
 
-      <BottomNav active="settings" />
     </div>
   );
 };

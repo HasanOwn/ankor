@@ -38,7 +38,7 @@ const BottomNav = ({ active }: BottomNavProps) => {
         {fabOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm flex items-end justify-center"
             onClick={() => setFabOpen(false)}
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 110px)' }}
           >
@@ -47,7 +47,7 @@ const BottomNav = ({ active }: BottomNavProps) => {
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 16, opacity: 0, scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-              className="absolute left-1/2 bottom-28 -translate-x-1/2 bg-card rounded-2xl shadow-xl p-2 w-60 border border-border"
+              className="bg-card rounded-2xl shadow-xl p-2 w-60 border border-border"
               onClick={(e) => e.stopPropagation()}
             >
               <MenuRow icon={<Download className="h-5 w-5" />} label="Get shared decks"
