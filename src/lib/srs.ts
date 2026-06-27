@@ -12,9 +12,13 @@ export interface SRSPreview {
 }
 
 function formatInterval(days: number): string {
-  if (days < 1) {
+  if (days < 1 / 24) {
     const mins = Math.max(1, Math.round(days * 24 * 60));
     return `${mins} min`;
+  }
+  if (days < 1) {
+    const hrs = Math.max(1, Math.round(days * 24));
+    return `${hrs} h`;
   }
   if (days < 30) return `${Math.round(days)} d`;
   if (days < 365) return `${(days / 30).toFixed(1)} mo`;
