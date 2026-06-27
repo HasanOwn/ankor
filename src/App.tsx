@@ -12,37 +12,49 @@ import WordList from "./pages/WordList";
 import Insights from "./pages/Insights";
 import Browser from "./pages/Browser";
 import NotFound from "./pages/NotFound";
+import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 
 const PageWrap = ({ children }: { children: React.ReactNode }) => (
   <motion.div
-    initial={{ opacity: 0, y: 8 }}
+    initial={{ opacity: 0, y: 4 }}
     animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -8 }}
-    transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.12, ease: 'easeOut' }}
   >
     {children}
   </motion.div>
 );
 
+const NAV_ROUTES: Record<string, 'home' | 'browser' | 'insights' | 'settings'> = {
+  '/': 'home',
+  '/browser': 'browser',
+  '/insights': 'insights',
+  '/settings': 'settings',
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const navTab = NAV_ROUTES[location.pathname];
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageWrap><Home /></PageWrap>} />
-        <Route path="/study/:setId" element={<PageWrap><StudyMode /></PageWrap>} />
-        <Route path="/words/:setId" element={<PageWrap><WordList /></PageWrap>} />
-        <Route path="/settings" element={<PageWrap><Settings /></PageWrap>} />
-        <Route path="/insights" element={<PageWrap><Insights /></PageWrap>} />
-        <Route path="/browser" element={<PageWrap><Browser /></PageWrap>} />
-        <Route path="/add" element={<Navigate to="/settings" replace />} />
-        <Route path="/words" element={<Navigate to="/" replace />} />
-        <Route path="/study" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
-      </Routes>
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageWrap><Home /></PageWrap>} />
+          <Route path="/study/:setId" element={<PageWrap><StudyMode /></PageWrap>} />
+          <Route path="/words/:setId" element={<PageWrap><WordList /></PageWrap>} />
+          <Route path="/settings" element={<PageWrap><Settings /></PageWrap>} />
+          <Route path="/insights" element={<PageWrap><Insights /></PageWrap>} />
+          <Route path="/browser" element={<PageWrap><Browser /></PageWrap>} />
+          <Route path="/add" element={<Navigate to="/settings" replace />} />
+          <Route path="/words" element={<Navigate to="/" replace />} />
+          <Route path="/study" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
+        </Routes>
+      </AnimatePresence>
+      {navTab && <BottomNav active={navTab} />}
+    </>
   );
 };
 
