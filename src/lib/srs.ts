@@ -56,7 +56,7 @@ export function applyRating(word: Word, rating: Rating): Word {
       break;
     case 'hard':
       ease = Math.max(MIN_EASE, ease - 0.15);
-      interval = isNew ? 1 : Math.max(1, interval * 1.2);
+      interval = isNew ? 2 / 24 : Math.max(2 / 24, interval * 1.2);
       state = 'review';
       break;
     case 'good':
