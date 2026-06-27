@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import WordForm from '@/components/WordForm';
 import { toast } from 'sonner';
-import BottomNav from '@/components/BottomNav';
 
 type StateFilter = 'all' | CardState | 'due';
 
@@ -160,7 +159,6 @@ const Browser = () => {
           )}
         </DialogContent>
       </Dialog>
-      <BottomNav active="browser" />
     </div>
   );
 };

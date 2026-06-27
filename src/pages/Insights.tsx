@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet } from '@/types/word';
 import { bucketCounts } from '@/lib/srs';
-import BottomNav from '@/components/BottomNav';
 
 interface StudySession { date: string; cards: number; minutes: number; }
 
@@ -145,7 +144,6 @@ const Insights = () => {
           </div>
         </section>
       </main>
-      <BottomNav active="insights" />
     </div>
   );
 };
