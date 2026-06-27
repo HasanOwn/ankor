@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home as HomeIcon, Search as SearchIcon, BarChart3, Settings as SettingsIcon,
-  Plus, X, FolderPlus, FilePlus2, Download,
+  Plus, FolderPlus, FilePlus2, Download,
 } from 'lucide-react';
 import CreateSetDialog from '@/components/CreateSetDialog';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -38,80 +38,84 @@ const BottomNav = ({ active }: BottomNavProps) => {
         {fabOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm flex items-end justify-center pb-32"
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
             onClick={() => setFabOpen(false)}
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 110px)' }}
           >
             <motion.div
-              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
-              className="bg-card rounded-2xl card-elev p-2 w-64 border border-border"
+              initial={{ y: 16, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 16, opacity: 0, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              className="absolute left-1/2 bottom-28 -translate-x-1/2 bg-card rounded-2xl shadow-xl p-2 w-60 border border-border"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                onClick={() => { setFabOpen(false); navigate('/settings'); }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <Download className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Get shared decks</span>
-              </button>
-              <button
-                onClick={() => { setFabOpen(false); setShowCreate(true); }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <FolderPlus className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Create deck</span>
-              </button>
-              <button
+              <MenuRow icon={<Download className="h-5 w-5" />} label="Get shared decks"
+                onClick={() => { setFabOpen(false); navigate('/settings'); }} />
+              <MenuRow icon={<FolderPlus className="h-5 w-5" />} label="Create deck"
+                onClick={() => { setFabOpen(false); setShowCreate(true); }} />
+              <MenuRow icon={<FilePlus2 className="h-5 w-5" />} label="Create card"
                 onClick={() => {
                   setFabOpen(false);
                   if (vocabSets[0]) navigate(`/words/${vocabSets[0].id}`);
                   else toast.info('Create a deck first');
-                }}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left"
-              >
-                <FilePlus2 className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">Create card</span>
-              </button>
+                }} />
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* iOS / Telegram style tab bar */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 z-30 bg-card/85 backdrop-blur-xl border-t border-border/60"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      {/* Telegram-style floating pill navbar */}
+      <div
+        className="fixed left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
       >
-        <div className="container max-w-2xl mx-auto px-4 py-2 flex items-center justify-around relative">
-          <NavItem icon={<HomeIcon className="h-[22px] w-[22px]" />} label="Home" active={active === 'home'} onClick={() => navigate('/')} />
-          <NavItem icon={<SearchIcon className="h-[22px] w-[22px]" />} label="Browser" active={active === 'browser'} onClick={() => navigate('/browser')} />
-          <div className="w-14" />
-          <NavItem icon={<BarChart3 className="h-[22px] w-[22px]" />} label="Insights" active={active === 'insights'} onClick={() => navigate('/insights')} />
-          <NavItem icon={<SettingsIcon className="h-[22px] w-[22px]" />} label="Settings" active={active === 'settings'} onClick={() => navigate('/settings')} />
+        <nav className="pointer-events-auto flex items-center gap-1 px-2 py-2 bg-card/90 backdrop-blur-xl border border-border/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+          <NavItem icon={<HomeIcon className="h-5 w-5" />} active={active === 'home'} onClick={() => navigate('/')} />
+          <NavItem icon={<SearchIcon className="h-5 w-5" />} active={active === 'browser'} onClick={() => navigate('/browser')} />
 
           <button
             onClick={() => setFabOpen(o => !o)}
-            className="absolute left-1/2 top-3 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-            aria-label="Add"
+            className="mx-1 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-md flex items-center justify-center active:scale-90 transition-transform"
+            aria-label={fabOpen ? 'Close menu' : 'Open menu'}
           >
-            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} className="flex items-center justify-center">
-              {fabOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
-            </motion.div>
+            <motion.span
+              animate={{ rotate: fabOpen ? 45 : 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="flex items-center justify-center"
+            >
+              <Plus className="h-6 w-6" strokeWidth={2.5} />
+            </motion.span>
           </button>
-        </div>
-      </nav>
+
+          <NavItem icon={<BarChart3 className="h-5 w-5" />} active={active === 'insights'} onClick={() => navigate('/insights')} />
+          <NavItem icon={<SettingsIcon className="h-5 w-5" />} active={active === 'settings'} onClick={() => navigate('/settings')} />
+        </nav>
+      </div>
     </>
   );
 };
 
 const NavItem = ({
-  icon, label, active, onClick,
-}: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) => (
+  icon, active, onClick,
+}: { icon: React.ReactNode; active?: boolean; onClick?: () => void }) => (
   <button
     onClick={onClick}
-    className={`flex flex-col items-center gap-0.5 px-3 py-1.5 transition-colors ${active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+      active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+    }`}
   >
     {icon}
-    <span className="text-[10px] font-medium">{label}</span>
+  </button>
+);
+
+const MenuRow = ({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-muted text-left text-primary"
+  >
+    {icon}
+    <span className="text-sm font-medium text-foreground">{label}</span>
   </button>
 );
 

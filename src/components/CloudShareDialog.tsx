@@ -304,8 +304,11 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>☁️ Cloud Share</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="flex items-center justify-center gap-2">
+            <Cloud className="h-5 w-5 text-primary" />
+            Cloud Share
+          </DialogTitle>
+          <DialogDescription className="text-center">
             Upload your sets or download sets from other users
           </DialogDescription>
         </DialogHeader>
