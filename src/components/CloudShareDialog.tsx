@@ -302,160 +302,150 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-center gap-2">
-            <Cloud className="h-5 w-5 text-primary" />
-            Cloud Share
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            Upload your sets or download sets from other users
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload">Upload</TabsTrigger>
-            <TabsTrigger value="search">Search & Download</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="upload" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Your Username</Label>
-              <Input
-                id="username"
-                placeholder="kamoliddin"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
+      <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden">
+        <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-primary/5 to-transparent">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-2">
+              <Cloud className="h-6 w-6 text-primary" />
             </div>
+            <DialogTitle className="text-center text-xl">Cloud Share</DialogTitle>
+            <DialogDescription className="text-center text-xs">
+              Sync your decks & notes across devices
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="set-select">Select Set to Upload</Label>
-              <select
-                id="set-select"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={selectedSet}
-                onChange={(e) => setSelectedSet(e.target.value)}
-              >
-                <option value="">Choose a set...</option>
-                {vocabSets.map(set => (
-                  <option key={set.id} value={set.id}>
-                    {set.name} ({set.words.length} words)
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="px-6 pb-6">
+          <Tabs defaultValue="upload" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 h-10 rounded-xl bg-muted/60">
+              <TabsTrigger value="upload" className="rounded-lg text-xs">
+                <Upload className="h-3.5 w-3.5 mr-1.5" />Upload
+              </TabsTrigger>
+              <TabsTrigger value="search" className="rounded-lg text-xs">
+                <Download className="h-3.5 w-3.5 mr-1.5" />Download
+              </TabsTrigger>
+            </TabsList>
 
-            <Button 
-              onClick={handleUpload} 
-              disabled={isUploading || !username || !selectedSet}
-              className="w-full"
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Set
-                </>
-              )}
-            </Button>
-
-            <div className="pt-4 border-t border-border space-y-2">
-              <Label>Upload All Notes</Label>
-              <p className="text-xs text-muted-foreground">
-                Upload your "My Notes" documents so you can download them on another device.
-              </p>
-              <Button
-                onClick={handleUploadNotes}
-                disabled={isUploading || !username || !documents.length}
-                variant="outline"
-                className="w-full"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Notes ({documents.length})
-                  </>
-                )}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="search" className="space-y-4">
-            <div className="flex gap-2">
-              <div className="flex-1">
+            <TabsContent value="upload" className="space-y-4 mt-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="username" className="text-xs text-muted-foreground">Your username</Label>
                 <Input
-                  placeholder="Enter username to search..."
-                  value={searchUsername}
-                  onChange={(e) => setSearchUsername(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  id="username"
+                  placeholder="e.g. kamoliddin"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="rounded-xl h-11 bg-muted/40 border-border/60"
                 />
               </div>
-              <Button onClick={handleSearch} disabled={isSearching}>
-                {isSearching ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
 
-            {searchResults.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    {searchResults.length} set(s) found from {searchUsername}
-                  </p>
-                  <Button onClick={handleImportAll} variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Add All Sets
+              <div className="space-y-1.5">
+                <Label htmlFor="set-select" className="text-xs text-muted-foreground">Pick a deck</Label>
+                <select
+                  id="set-select"
+                  className="flex h-11 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  value={selectedSet}
+                  onChange={(e) => setSelectedSet(e.target.value)}
+                >
+                  <option value="">Choose a deck…</option>
+                  {vocabSets.map(set => (
+                    <option key={set.id} value={set.id}>
+                      {set.name} · {set.words.length} cards
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Button
+                onClick={handleUpload}
+                disabled={isUploading || !username || !selectedSet}
+                className="w-full h-11 rounded-xl"
+              >
+                {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                Upload deck
+              </Button>
+
+              <div className="pt-4 border-t border-border/60">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="text-sm font-medium">My Notes</p>
+                    <p className="text-xs text-muted-foreground">{documents.length} document{documents.length === 1 ? '' : 's'}</p>
+                  </div>
+                  <Button
+                    onClick={handleUploadNotes}
+                    disabled={isUploading || !username || !documents.length}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                  >
+                    {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Upload className="h-3.5 w-3.5 mr-1.5" />Upload</>}
                   </Button>
                 </div>
-
-                <ScrollArea className="h-[300px] rounded-md border p-4">
-                  <div className="space-y-2">
-                    {searchResults.map((cloudSet) => {
-                      const isNotes = isNotesCloudSet(cloudSet);
-                      const itemCount = Array.isArray(cloudSet.data) ? cloudSet.data.length : 0;
-
-                      return (
-                        <div
-                          key={cloudSet.id}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                        >
-                          <div>
-                            <p className="font-medium">{cloudSet.set_name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {itemCount} {isNotes ? 'notes' : 'words'}
-                            </p>
-                          </div>
-                          <Button
-                            onClick={() => (isNotes ? importNotesFromCloud(cloudSet) : handleImportSet(cloudSet))}
-                            variant="ghost"
-                            size="sm"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            {isNotes ? 'Add Notes' : 'Add'}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+
+            <TabsContent value="search" className="space-y-4 mt-5">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Search by username</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter username…"
+                    value={searchUsername}
+                    onChange={(e) => setSearchUsername(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    className="rounded-xl h-11 bg-muted/40 border-border/60"
+                  />
+                  <Button onClick={handleSearch} disabled={isSearching} className="rounded-xl h-11 px-4">
+                    {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {searchResults.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {searchResults.length} item{searchResults.length === 1 ? '' : 's'}
+                    </p>
+                    <Button onClick={handleImportAll} variant="ghost" size="sm" className="h-8 text-xs">
+                      <Download className="h-3.5 w-3.5 mr-1.5" />Add all decks
+                    </Button>
+                  </div>
+
+                  <ScrollArea className="h-[260px] -mx-1 px-1">
+                    <div className="space-y-2">
+                      {searchResults.map((cloudSet) => {
+                        const isNotes = isNotesCloudSet(cloudSet);
+                        const itemCount = Array.isArray(cloudSet.data) ? cloudSet.data.length : 0;
+                        return (
+                          <div
+                            key={cloudSet.id}
+                            className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors"
+                          >
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm truncate">{cloudSet.set_name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {itemCount} {isNotes ? 'notes' : 'cards'}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => (isNotes ? importNotesFromCloud(cloudSet) : handleImportSet(cloudSet))}
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 rounded-lg shrink-0"
+                            >
+                              <Download className="h-3.5 w-3.5 mr-1.5" />
+                              Add
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );
