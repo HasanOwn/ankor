@@ -89,7 +89,7 @@ const Browser = () => {
           </div>
           <div className="flex gap-2">
             <Select value={deckFilter} onValueChange={setDeckFilter}>
-              <SelectTrigger className="flex-1 bg-card border-border rounded-xl h-10">
+              <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All decks" />
               </SelectTrigger>
               <SelectContent>
@@ -98,7 +98,7 @@ const Browser = () => {
               </SelectContent>
             </Select>
             <Select value={stateFilter} onValueChange={(v) => setStateFilter(v as StateFilter)}>
-              <SelectTrigger className="flex-1 bg-card border-border rounded-xl h-10">
+              <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All states" />
               </SelectTrigger>
               <SelectContent>
