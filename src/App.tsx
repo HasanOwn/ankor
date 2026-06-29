@@ -38,20 +38,18 @@ const AnimatedRoutes = () => {
   const navTab = NAV_ROUTES[location.pathname];
   return (
     <>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrap><Home /></PageWrap>} />
-          <Route path="/study/:setId" element={<PageWrap><StudyMode /></PageWrap>} />
-          <Route path="/words/:setId" element={<PageWrap><WordList /></PageWrap>} />
-          <Route path="/settings" element={<PageWrap><Settings /></PageWrap>} />
-          <Route path="/insights" element={<PageWrap><Insights /></PageWrap>} />
-          <Route path="/browser" element={<PageWrap><Browser /></PageWrap>} />
-          <Route path="/add" element={<Navigate to="/settings" replace />} />
-          <Route path="/words" element={<Navigate to="/" replace />} />
-          <Route path="/study" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
-        </Routes>
-      </AnimatePresence>
+      <Routes location={location}>
+        <Route path="/" element={<PageWrap><Home /></PageWrap>} />
+        <Route path="/study/:setId" element={<PageWrap><StudyMode /></PageWrap>} />
+        <Route path="/words/:setId" element={<PageWrap><WordList /></PageWrap>} />
+        <Route path="/settings" element={<PageWrap><Settings /></PageWrap>} />
+        <Route path="/insights" element={<PageWrap><Insights /></PageWrap>} />
+        <Route path="/browser" element={<PageWrap><Browser /></PageWrap>} />
+        <Route path="/add" element={<Navigate to="/settings" replace />} />
+        <Route path="/words" element={<Navigate to="/" replace />} />
+        <Route path="/study" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
+      </Routes>
       {navTab && <BottomNav active={navTab} />}
     </>
   );
