@@ -6,34 +6,34 @@
 
 @layer base {
   :root {
-    /* Surfaces */
-    --background: 224 100% 97%;        /* #F0F4FF light blue-gray */
-    --foreground: 224 43% 17%;         /* #1A2340 text primary */
+    /* Surfaces — creamy off-white */
+    --background: 36 33% 96%;          /* #F7F3EC creamy */
+    --foreground: 30 12% 15%;          /* warm dark */
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 43% 17%;
+    --card: 40 40% 98%;                /* #FBF8F2 */
+    --card-foreground: 30 12% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 43% 17%;
+    --popover: 40 40% 98%;
+    --popover-foreground: 30 12% 15%;
 
     /* Brand */
     --primary: 222 91% 63%;            /* #4A7CF7 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 224 100% 95%;
-    --secondary-foreground: 224 43% 17%;
+    --secondary: 36 28% 92%;
+    --secondary-foreground: 30 12% 15%;
 
-    --muted: 224 60% 95%;
-    --muted-foreground: 218 14% 60%;   /* #8A94A6 */
+    --muted: 36 25% 92%;
+    --muted-foreground: 30 8% 45%;
 
-    --accent: 224 100% 95%;
-    --accent-foreground: 224 43% 17%;
+    --accent: 36 28% 92%;
+    --accent-foreground: 30 12% 15%;
 
     --destructive: 11 87% 68%;         /* #F4836A coral */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 224 40% 92%;
-    --input: 224 40% 92%;
+    --border: 36 20% 88%;
+    --input: 36 20% 88%;
     --ring: 222 91% 63%;
 
     --radius: 1rem;
