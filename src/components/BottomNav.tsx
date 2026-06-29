@@ -65,6 +65,12 @@ const BottomNav = ({ active }: BottomNavProps) => {
         )}
       </AnimatePresence>
 
+      {/* Blurred fade underlay so content scrolling beneath the navbar is softened */}
+      <div
+        aria-hidden
+        className="fixed inset-x-0 bottom-0 z-40 pointer-events-none h-32 backdrop-blur-md [mask-image:linear-gradient(to_top,black_35%,transparent)]"
+      />
+
       {/* Telegram-style floating pill navbar */}
       <div
         className="fixed left-1/2 -translate-x-1/2 z-50 pointer-events-none"

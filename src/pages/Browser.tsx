@@ -79,7 +79,7 @@ const Browser = () => {
               placeholder="Search all cards…"
               value={q}
               onChange={e => setQ(e.target.value)}
-              className="pl-10 pr-10 bg-card border-border rounded-xl"
+              className="pl-10 pr-10 bg-muted/50 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/30"
             />
             {q && (
               <button onClick={() => setQ('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -89,7 +89,7 @@ const Browser = () => {
           </div>
           <div className="flex gap-2">
             <Select value={deckFilter} onValueChange={setDeckFilter}>
-              <SelectTrigger className="flex-1 bg-card border-border rounded-xl h-10">
+              <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All decks" />
               </SelectTrigger>
               <SelectContent>
@@ -98,7 +98,7 @@ const Browser = () => {
               </SelectContent>
             </Select>
             <Select value={stateFilter} onValueChange={(v) => setStateFilter(v as StateFilter)}>
-              <SelectTrigger className="flex-1 bg-card border-border rounded-xl h-10">
+              <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All states" />
               </SelectTrigger>
               <SelectContent>

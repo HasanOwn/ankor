@@ -17,6 +17,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 interface CloudShareDialogProps {
   vocabSets: VocabSet[];
@@ -340,19 +343,18 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
 
               <div className="space-y-1.5">
                 <Label htmlFor="set-select" className="text-xs text-muted-foreground">Pick a deck</Label>
-                <select
-                  id="set-select"
-                  className="flex h-11 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  value={selectedSet}
-                  onChange={(e) => setSelectedSet(e.target.value)}
-                >
-                  <option value="">Choose a deck…</option>
-                  {vocabSets.map(set => (
-                    <option key={set.id} value={set.id}>
-                      {set.name} · {set.words.length} cards
-                    </option>
-                  ))}
-                </select>
+                <Select value={selectedSet} onValueChange={setSelectedSet}>
+                  <SelectTrigger id="set-select" className="h-11 rounded-xl bg-muted/40 border-border/60">
+                    <SelectValue placeholder="Choose a deck…" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {vocabSets.map(set => (
+                      <SelectItem key={set.id} value={set.id} className="rounded-lg">
+                        {set.name} · {set.words.length} cards
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button
