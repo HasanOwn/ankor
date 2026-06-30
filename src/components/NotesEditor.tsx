@@ -312,7 +312,7 @@ const NotesEditor = ({
               <div className="flex-1 w-full max-h-[78vh] overflow-y-auto overflow-x-hidden px-6 py-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div
                   className="prose prose-sm dark:prose-invert max-w-none break-words whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: viewDoc.content }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(viewDoc.content || '') }}
                 />
               </div>
             </div>
