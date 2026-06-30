@@ -105,7 +105,10 @@ const WordList = () => {
     setCategorizing(true);
     try {
       const payload = currentSet.words.map(w => ({ id: w.id, term: w.korean, translation: w.uzbek }));
-      const { data, error } = await supabase.functions.invoke('categorize-words', { body: { words: payload } });
+      const { data, error } = await supabase.functions.invoke('categorize-words', {
+        body: { words: payload },
+        headers: { 'x-app-token': 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const assignments: { id: number; category: string }[] = data?.assignments || [];
