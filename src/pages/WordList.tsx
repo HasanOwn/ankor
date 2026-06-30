@@ -107,7 +107,7 @@ const WordList = () => {
       const payload = currentSet.words.map(w => ({ id: w.id, term: w.korean, translation: w.uzbek }));
       const { data, error } = await supabase.functions.invoke('categorize-words', {
         body: { words: payload },
-        headers: { 'x-app-token': import.meta.env.VITE_CATEGORIZE_CLIENT_TOKEN ?? '' },
+        headers: { 'x-app-token': 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
