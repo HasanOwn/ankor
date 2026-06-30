@@ -7,6 +7,15 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
 
+    const expectedToken = Deno.env.get('CATEGORIZE_CLIENT_TOKEN');
+    const providedToken = req.headers.get('x-app-token');
+    if (!expectedToken || providedToken !== expectedToken) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { words } = await req.json();
     if (!Array.isArray(words) || words.length === 0) {
       return new Response(JSON.stringify({ error: 'words array required' }), {
