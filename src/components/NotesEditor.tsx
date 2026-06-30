@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import FontSize from '@tiptap/extension-font-size';
+import DOMPurify from 'dompurify';
 interface NotesEditorProps {
   onClose: () => void;
 }
