@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Search as SearchIcon, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,9 +121,20 @@ const Browser = () => {
             No cards match your filters.
           </div>
         ) : (
-          <ul className="space-y-2">
+          <motion.ul
+            className="space-y-2"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.025 } } }}
+          >
             {rows.map(r => (
-              <li key={`${r.setId}-${r.word.id}`}>
+              <motion.li
+                key={`${r.setId}-${r.word.id}`}
+                variants={{
+                  hidden: { opacity: 0, y: 8 },
+                  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 28 } },
+                }}
+              >
                 <button
                   onClick={() => setEditing(r)}
                   className="w-full text-left bg-card rounded-2xl card-elev p-4 hover:bg-accent transition-colors flex items-start gap-3"
@@ -142,9 +154,9 @@ const Browser = () => {
                   </div>
                   <Pencil className="h-4 w-4 text-muted-foreground mt-1" />
                 </button>
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         )}
       </main>
 
