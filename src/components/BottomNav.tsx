@@ -70,6 +70,10 @@ const BottomNav = ({ active }: BottomNavProps) => {
         aria-hidden
         className="fixed inset-x-0 bottom-0 z-40 pointer-events-none h-20 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,black_50%,transparent)]"
       />
+      <div
+        aria-hidden
+        className="fixed inset-x-0 top-0 z-40 pointer-events-none h-16 backdrop-blur-[3px] [mask-image:linear-gradient(to_bottom,black_50%,transparent)]"
+      />
 
       {/* Telegram-style floating pill navbar */}
       <div
