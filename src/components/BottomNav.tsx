@@ -107,18 +107,11 @@ const NavItem = ({
 }: { icon: React.ReactNode; active?: boolean; onClick?: () => void }) => (
   <button
     onClick={onClick}
-    className={`relative w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform ${
-      active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+      active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
     }`}
   >
-    {active && (
-      <motion.span
-        layoutId="nav-pill"
-        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        className="absolute inset-0 rounded-full bg-primary/10"
-      />
-    )}
-    <span className="relative z-10">{icon}</span>
+    {icon}
   </button>
 );
 
