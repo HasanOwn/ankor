@@ -240,7 +240,7 @@ const Settings = () => {
           />
         </Section>
 
-        <Section title="About">
+        <Section title="About" delay={0.1}>
           <Row
             icon={<Info className="h-4 w-4" />}
             iconBg="bg-muted text-muted-foreground"
