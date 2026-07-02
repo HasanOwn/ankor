@@ -201,19 +201,26 @@ const Home = () => {
           </div>
 
           {vocabSets.length === 0 ? (
-            <div className="bg-card rounded-2xl card-elev p-8 text-center text-muted-foreground">
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="bg-card rounded-2xl card-elev p-8 text-center text-muted-foreground">
               <p className="text-sm">No decks yet. Tap the <span className="text-primary font-semibold">+</span> to create one.</p>
-            </div>
+            </motion.div>
           ) : (
             <div className="space-y-3">
-              {vocabSets.map(set => (
-                <DeckCard
+              {vocabSets.map((set, i) => (
+                <motion.div
                   key={set.id}
-                  set={set}
-                  onStudy={() => navigate(`/study/${set.id}`)}
-                  onEdit={() => navigate(`/words/${set.id}`)}
-                  onDelete={() => setVocabSets(vocabSets.filter(s => s.id !== set.id))}
-                />
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.04 }}
+                >
+                  <DeckCard
+                    set={set}
+                    onStudy={() => navigate(`/study/${set.id}`)}
+                    onEdit={() => navigate(`/words/${set.id}`)}
+                    onDelete={() => setVocabSets(vocabSets.filter(s => s.id !== set.id))}
+                  />
+                </motion.div>
               ))}
             </div>
           )}
