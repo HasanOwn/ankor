@@ -209,7 +209,7 @@ const Settings = () => {
           />
         </Section>
 
-        <Section title="Data">
+        <Section title="Data" delay={0.05}>
           <Row
             icon={<ClipboardPaste className="h-4 w-4" />}
             iconBg="bg-primary/10 text-primary"
