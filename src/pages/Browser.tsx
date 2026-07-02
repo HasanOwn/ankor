@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Search as SearchIcon, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -116,13 +117,19 @@ const Browser = () => {
       <main className="container max-w-2xl mx-auto px-4 pt-2">
         <div className="text-xs text-muted-foreground mb-3">{rows.length} card{rows.length === 1 ? '' : 's'}</div>
         {rows.length === 0 ? (
-          <div className="bg-card rounded-2xl card-elev p-8 text-center text-muted-foreground text-sm">
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="bg-card rounded-2xl card-elev p-8 text-center text-muted-foreground text-sm">
             No cards match your filters.
-          </div>
+          </motion.div>
         ) : (
           <ul className="space-y-2">
-            {rows.map(r => (
-              <li key={`${r.setId}-${r.word.id}`}>
+            {rows.map((r, i) => (
+              <motion.li
+                key={`${r.setId}-${r.word.id}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.03, 0.3) }}
+              >
                 <button
                   onClick={() => setEditing(r)}
                   className="w-full text-left bg-card rounded-2xl card-elev p-4 hover:bg-accent transition-colors flex items-start gap-3"
@@ -142,7 +149,7 @@ const Browser = () => {
                   </div>
                   <Pencil className="h-4 w-4 text-muted-foreground mt-1" />
                 </button>
-              </li>
+              </motion.li>
             ))}
           </ul>
         )}

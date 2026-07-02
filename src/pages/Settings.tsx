@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { z } from 'zod';
 import {
@@ -52,8 +53,13 @@ const vocabSetSchema = z.object({
 });
 const vocabSetsSchema = z.array(vocabSetSchema);
 
-const Section = ({ title, children }: { title?: string; children: React.ReactNode }) => (
-  <section className="space-y-2">
+const Section = ({ title, children, delay = 0 }: { title?: string; children: React.ReactNode; delay?: number }) => (
+  <motion.section
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="space-y-2"
+  >
     {title && (
       <h2 className="px-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {title}
@@ -62,7 +68,7 @@ const Section = ({ title, children }: { title?: string; children: React.ReactNod
     <div className="bg-card rounded-2xl card-elev overflow-hidden divide-y divide-border/60">
       {children}
     </div>
-  </section>
+  </motion.section>
 );
 
 const Row = ({
@@ -182,7 +188,7 @@ const Settings = () => {
       </header>
 
       <main className="container max-w-2xl mx-auto px-4 pt-2 space-y-6">
-        <Section title="Appearance">
+        <Section title="Appearance" delay={0}>
           <Row
             icon={<Moon className="h-4 w-4" />}
             iconBg="bg-primary/10 text-primary"
@@ -203,7 +209,7 @@ const Settings = () => {
           />
         </Section>
 
-        <Section title="Data">
+        <Section title="Data" delay={0.05}>
           <Row
             icon={<ClipboardPaste className="h-4 w-4" />}
             iconBg="bg-primary/10 text-primary"
@@ -234,7 +240,7 @@ const Settings = () => {
           />
         </Section>
 
-        <Section title="About">
+        <Section title="About" delay={0.1}>
           <Row
             icon={<Info className="h-4 w-4" />}
             iconBg="bg-muted text-muted-foreground"
@@ -249,7 +255,7 @@ const Settings = () => {
           />
         </Section>
 
-        <Section title="Danger Zone">
+        <Section title="Danger Zone" delay={0.15}>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors">
