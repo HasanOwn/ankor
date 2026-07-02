@@ -188,7 +188,7 @@ const Settings = () => {
       </header>
 
       <main className="container max-w-2xl mx-auto px-4 pt-2 space-y-6">
-        <Section title="Appearance">
+        <Section title="Appearance" delay={0}>
           <Row
             icon={<Moon className="h-4 w-4" />}
             iconBg="bg-primary/10 text-primary"
