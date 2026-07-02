@@ -53,8 +53,13 @@ const vocabSetSchema = z.object({
 });
 const vocabSetsSchema = z.array(vocabSetSchema);
 
-const Section = ({ title, children }: { title?: string; children: React.ReactNode }) => (
-  <section className="space-y-2">
+const Section = ({ title, children, delay = 0 }: { title?: string; children: React.ReactNode; delay?: number }) => (
+  <motion.section
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="space-y-2"
+  >
     {title && (
       <h2 className="px-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {title}
@@ -63,7 +68,7 @@ const Section = ({ title, children }: { title?: string; children: React.ReactNod
     <div className="bg-card rounded-2xl card-elev overflow-hidden divide-y divide-border/60">
       {children}
     </div>
-  </section>
+  </motion.section>
 );
 
 const Row = ({
