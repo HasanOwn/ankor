@@ -88,7 +88,7 @@ const Browser = () => {
               </button>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <Select value={deckFilter} onValueChange={setDeckFilter}>
               <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All decks" />
@@ -123,13 +123,8 @@ const Browser = () => {
           </motion.div>
         ) : (
           <ul className="space-y-2">
-            {rows.map((r, i) => (
-              <motion.li
-                key={`${r.setId}-${r.word.id}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i * 0.03, 0.3) }}
-              >
+            {rows.map((r) => (
+              <li key={`${r.setId}-${r.word.id}`}>
                 <button
                   onClick={() => setEditing(r)}
                   className="w-full text-left bg-card rounded-2xl card-elev p-4 hover:bg-accent transition-colors flex items-start gap-3"
@@ -149,14 +144,17 @@ const Browser = () => {
                   </div>
                   <Pencil className="h-4 w-4 text-muted-foreground mt-1" />
                 </button>
-              </motion.li>
+              </li>
             ))}
           </ul>
         )}
       </main>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent className="bg-card max-w-lg">
+        <DialogContent
+          className="bg-card max-w-lg"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>Edit card {editing && <span className="text-xs text-muted-foreground font-normal">· {editing.setName}</span>}</DialogTitle>
           </DialogHeader>
