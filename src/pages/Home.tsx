@@ -34,16 +34,19 @@ const Badge = ({ tone, children }: { tone: 'new' | 'learning' | 'review'; childr
 };
 
 const DeckCard = ({
-  set, onStudy, onEdit, onDelete,
+  set, onStudy, onEdit, onDelete, onCategorize, categorizing,
 }: {
   set: VocabSet;
   onStudy: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onCategorize: () => void;
+  categorizing: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const counts = bucketCounts(set.words || []);
   const total = set.words?.length || 0;
+  const hasCategories = (set.words || []).some(w => w.category);
 
   return (
     <motion.div layout className="bg-card rounded-2xl card-elev overflow-hidden">
@@ -96,6 +99,16 @@ const DeckCard = ({
               </button>
               <button onClick={onEdit} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
                 <Pencil className="h-4 w-4" /> Edit
+              </button>
+              <button
+                onClick={onCategorize}
+                disabled={categorizing || total === 0}
+                className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border disabled:opacity-50"
+              >
+                {categorizing
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <Sparkles className="h-4 w-4" />}
+                {hasCategories ? 'Re-group' : 'AI Group'}
               </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
