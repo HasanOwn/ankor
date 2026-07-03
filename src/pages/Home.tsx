@@ -140,6 +140,33 @@ const Home = () => {
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [sessions] = useLocalStorage<StudySession[]>('study-sessions', []);
   const [showSearch, setShowSearch] = useState(false);
+  const [categorizingId, setCategorizingId] = useState<string | null>(null);
+
+  const handleCategorize = async (set: VocabSet) => {
+    if (!set.words?.length) { toast.info('Add words first'); return; }
+    setCategorizingId(set.id);
+    try {
+      const payload = set.words.map(w => ({ id: w.id, term: w.korean, translation: w.uzbek }));
+      const { data, error } = await supabase.functions.invoke('categorize-words', {
+        body: { words: payload },
+        headers: { 'x-app-token': 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const assignments: { id: number; category: string }[] = data?.assignments || [];
+      const map = new Map(assignments.map(a => [a.id, a.category]));
+      const updated: VocabSet = {
+        ...set,
+        words: set.words.map((w: Word) => ({ ...w, category: map.get(w.id) || w.category || 'Uncategorized' })),
+      };
+      setVocabSets(vocabSets.map(s => s.id === set.id ? updated : s));
+      toast.success(`Grouped ${assignments.length} words`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to categorize');
+    } finally {
+      setCategorizingId(null);
+    }
+  };
 
   const today = new Date().toISOString().slice(0, 10);
   const todaySession = sessions.find(s => s.date === today);
