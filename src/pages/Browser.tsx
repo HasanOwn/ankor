@@ -88,7 +88,7 @@ const Browser = () => {
               </button>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <Select value={deckFilter} onValueChange={setDeckFilter}>
               <SelectTrigger className="flex-1 bg-muted/50 border-0 rounded-xl h-11 focus:ring-1 focus:ring-primary/30">
                 <SelectValue placeholder="All decks" />
