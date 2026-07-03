@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import {
   RefreshCw, ChevronDown, Eye, Pencil,
-  Search as SearchIcon, Trash2, Cloud,
+  Search as SearchIcon, Trash2, Cloud, Sparkles, Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { VocabSet } from '@/types/word';
+import { VocabSet, Word } from '@/types/word';
 import { bucketCounts } from '@/lib/srs';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
