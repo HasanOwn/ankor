@@ -105,7 +105,7 @@ const Row = ({
 const Settings = () => {
   const navigate = useNavigate();
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, accent, setAccent } = useTheme();
   const [jsonOpen, setJsonOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
