@@ -4,10 +4,10 @@ import { useRef, useState } from 'react';
 import { z } from 'zod';
 import {
   ChevronRight, Download, Upload, Trash2, FileJson, Moon,
-  ArrowLeft, Palette, Database, AlertTriangle, Info, ClipboardPaste,
+  ArrowLeft, Database, AlertTriangle, Info, ClipboardPaste, Check,
 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useTheme } from '@/components/ThemeProvider';
+import { useTheme, ACCENTS } from '@/components/ThemeProvider';
 import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
