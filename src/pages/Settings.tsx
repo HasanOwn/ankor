@@ -201,12 +201,36 @@ const Settings = () => {
               />
             }
           />
-          <Row
-            icon={<Palette className="h-4 w-4" />}
-            iconBg="bg-badge-learning text-badge-learning-foreground"
-            title="Theme"
-            subtitle={theme === 'dark' ? 'Dark' : 'Light'}
-          />
+          <div className="px-4 py-4">
+            <div className="text-sm font-medium text-foreground mb-1">Accent color</div>
+            <div className="text-xs text-muted-foreground mb-3">
+              {theme === 'dark'
+                ? 'Available in Light mode'
+                : 'Personalize buttons, links & highlights'}
+            </div>
+            <div className="grid grid-cols-5 gap-3">
+              {ACCENTS.map((a) => {
+                const selected = accent === a.key;
+                const disabled = theme === 'dark';
+                return (
+                  <button
+                    key={a.key}
+                    onClick={() => !disabled && setAccent(a.key)}
+                    disabled={disabled}
+                    aria-label={a.name}
+                    className={`relative aspect-square rounded-full transition-transform ${
+                      selected ? 'scale-110 ring-2 ring-offset-2 ring-offset-card ring-foreground/40' : 'hover:scale-105'
+                    } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    style={{ backgroundColor: a.hex }}
+                  >
+                    {selected && (
+                      <Check className="absolute inset-0 m-auto h-4 w-4 text-white drop-shadow" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Section>
 
         <Section title="Data" delay={0.05}>
