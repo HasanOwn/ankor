@@ -251,6 +251,39 @@ const Settings = () => {
           </div>
         </Section>
 
+        <Section title="Reminders" delay={0.03}>
+          <Row
+            icon={<Bell className="h-4 w-4" />}
+            iconBg="bg-primary/10 text-primary"
+            title="Daily reminder"
+            subtitle="Get a notification to review your cards"
+            right={
+              <Switch
+                checked={reminder.enabled}
+                onCheckedChange={toggleReminder}
+              />
+            }
+          />
+          {reminder.enabled && (
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="w-8 h-8 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+                <Bell className="h-4 w-4" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-foreground">Reminder time</div>
+                <div className="text-xs text-muted-foreground">Fires while the app is open</div>
+              </div>
+              <input
+                type="time"
+                value={reminder.time}
+                onChange={(e) => changeReminderTime(e.target.value)}
+                className="bg-muted text-foreground text-sm rounded-lg px-3 py-1.5 outline-none"
+              />
+            </div>
+          )}
+        </Section>
+
+
         <Section title="Data" delay={0.05}>
           <Row
             icon={<ClipboardPaste className="h-4 w-4" />}
