@@ -334,7 +334,7 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
                 <Label htmlFor="username" className="text-xs text-muted-foreground">Your username</Label>
                 <Input
                   id="username"
-                  placeholder="e.g. kamoliddin"
+                  placeholder=""
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="rounded-xl h-11 bg-muted/40 border-border/60"
