@@ -56,15 +56,13 @@ export function ThemeProvider({
   useEffect(() => {
     const preset = ACCENTS.find(a => a.key === accent) || ACCENTS[0];
     const root = window.document.documentElement;
-    // Only override accent in light mode (dark mode uses neutral primary by design)
-    if (theme === 'light') {
-      root.style.setProperty('--primary', preset.hsl);
-      root.style.setProperty('--ring', preset.hsl);
-      root.style.setProperty('--glow', preset.hsl);
+    root.style.setProperty('--primary', preset.hsl);
+    root.style.setProperty('--ring', preset.hsl);
+    root.style.setProperty('--glow', preset.hsl);
+    if (theme === 'dark') {
+      root.style.setProperty('--primary-foreground', '0 0% 100%');
     } else {
-      root.style.removeProperty('--primary');
-      root.style.removeProperty('--ring');
-      root.style.removeProperty('--glow');
+      root.style.removeProperty('--primary-foreground');
     }
   }, [accent, theme]);
 
