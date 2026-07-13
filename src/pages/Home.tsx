@@ -3,14 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import {
   RefreshCw, ChevronDown, Eye, Pencil,
-  Search as SearchIcon, Trash2, Cloud, Sparkles, Loader2,
+  Search as SearchIcon, Trash2, Cloud,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { VocabSet, Word } from '@/types/word';
+import { VocabSet } from '@/types/word';
 import { bucketCounts } from '@/lib/srs';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -34,19 +33,16 @@ const Badge = ({ tone, children }: { tone: 'new' | 'learning' | 'review'; childr
 };
 
 const DeckCard = ({
-  set, onStudy, onEdit, onDelete, onCategorize, categorizing,
+  set, onStudy, onEdit, onDelete,
 }: {
   set: VocabSet;
   onStudy: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onCategorize: () => void;
-  categorizing: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const counts = bucketCounts(set.words || []);
   const total = set.words?.length || 0;
-  const hasCategories = (set.words || []).some(w => w.category);
 
   return (
     <motion.div layout className="bg-card rounded-2xl card-elev overflow-hidden">
