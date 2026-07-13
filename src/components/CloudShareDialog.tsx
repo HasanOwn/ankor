@@ -390,7 +390,7 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
                 <Label className="text-xs text-muted-foreground">Search by username</Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Enter username…"
+                    placeholder=""
                     value={searchUsername}
                     onChange={(e) => setSearchUsername(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
