@@ -3,14 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import {
   RefreshCw, ChevronDown, Eye, Pencil,
-  Search as SearchIcon, Trash2, Cloud, Sparkles, Loader2,
+  Search as SearchIcon, Trash2, Cloud,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { VocabSet, Word } from '@/types/word';
+import { VocabSet } from '@/types/word';
 import { bucketCounts } from '@/lib/srs';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -34,19 +33,16 @@ const Badge = ({ tone, children }: { tone: 'new' | 'learning' | 'review'; childr
 };
 
 const DeckCard = ({
-  set, onStudy, onEdit, onDelete, onCategorize, categorizing,
+  set, onStudy, onEdit, onDelete,
 }: {
   set: VocabSet;
   onStudy: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onCategorize: () => void;
-  categorizing: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const counts = bucketCounts(set.words || []);
   const total = set.words?.length || 0;
-  const hasCategories = (set.words || []).some(w => w.category);
 
   return (
     <motion.div layout className="bg-card rounded-2xl card-elev overflow-hidden">
@@ -94,25 +90,9 @@ const DeckCard = ({
               </div>
             </div>
             <div className="flex border-t border-border">
-              <button onClick={onStudy} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                <Eye className="h-4 w-4" /> Study
-              </button>
-              <button onClick={onEdit} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
-                <Pencil className="h-4 w-4" /> Edit
-              </button>
-              <button
-                onClick={onCategorize}
-                disabled={categorizing || total === 0}
-                className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border disabled:opacity-50"
-              >
-                {categorizing
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
-                  : <Sparkles className="h-4 w-4" />}
-                {hasCategories ? 'Re-group' : 'AI Group'}
-              </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-destructive transition-colors border-l border-border">
+                  <button className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-destructive transition-colors">
                     <Trash2 className="h-4 w-4" /> Delete
                   </button>
                 </AlertDialogTrigger>
@@ -127,6 +107,12 @@ const DeckCard = ({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <button onClick={onEdit} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
+                <Pencil className="h-4 w-4" /> Edit
+              </button>
+              <button onClick={onStudy} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
+                <Eye className="h-4 w-4" /> Study
+              </button>
             </div>
           </motion.div>
         )}
@@ -140,33 +126,7 @@ const Home = () => {
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [sessions] = useLocalStorage<StudySession[]>('study-sessions', []);
   const [showSearch, setShowSearch] = useState(false);
-  const [categorizingId, setCategorizingId] = useState<string | null>(null);
 
-  const handleCategorize = async (set: VocabSet) => {
-    if (!set.words?.length) { toast.info('Add words first'); return; }
-    setCategorizingId(set.id);
-    try {
-      const payload = set.words.map(w => ({ id: w.id, term: w.korean, translation: w.uzbek }));
-      const { data, error } = await supabase.functions.invoke('categorize-words', {
-        body: { words: payload },
-        headers: { 'x-app-token': 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      const assignments: { id: number; category: string }[] = data?.assignments || [];
-      const map = new Map(assignments.map(a => [a.id, a.category]));
-      const updated: VocabSet = {
-        ...set,
-        words: set.words.map((w: Word) => ({ ...w, category: map.get(w.id) || w.category || 'Uncategorized' })),
-      };
-      setVocabSets(vocabSets.map(s => s.id === set.id ? updated : s));
-      toast.success(`Grouped ${assignments.length} words`);
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to categorize');
-    } finally {
-      setCategorizingId(null);
-    }
-  };
 
   const today = new Date().toISOString().slice(0, 10);
   const todaySession = sessions.find(s => s.date === today);
@@ -260,8 +220,6 @@ const Home = () => {
                     onStudy={() => navigate(`/study/${set.id}`)}
                     onEdit={() => navigate(`/words/${set.id}`)}
                     onDelete={() => setVocabSets(vocabSets.filter(s => s.id !== set.id))}
-                    onCategorize={() => handleCategorize(set)}
-                    categorizing={categorizingId === set.id}
                   />
                 </motion.div>
               ))}

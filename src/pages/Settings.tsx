@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { z } from 'zod';
 import {
   ChevronRight, Download, Upload, Trash2, FileJson, Moon,
-  ArrowLeft, Database, AlertTriangle, Info, ClipboardPaste, Check,
+  ArrowLeft, Database, AlertTriangle, Info, ClipboardPaste, Check, Bell,
 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTheme, ACCENTS } from '@/components/ThemeProvider';
@@ -12,6 +12,7 @@ import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { getReminder, saveReminder, requestReminderPermission } from '@/lib/reminders';
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -109,6 +110,27 @@ const Settings = () => {
   const [jsonOpen, setJsonOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [reminder, setReminder] = useState(() => getReminder());
+
+  const toggleReminder = async (v: boolean) => {
+    if (v) {
+      const ok = await requestReminderPermission();
+      if (!ok) {
+        toast.error('Enable notifications in your browser to use reminders');
+        return;
+      }
+    }
+    const next = { ...reminder, enabled: v };
+    setReminder(next);
+    saveReminder(next);
+    toast.success(v ? `Reminder set for ${next.time}` : 'Reminder off');
+  };
+
+  const changeReminderTime = (time: string) => {
+    const next = { ...reminder, time };
+    setReminder(next);
+    saveReminder(next);
+  };
 
   const totalCards = vocabSets.reduce((a, s) => a + (s.words?.length || 0), 0);
 
@@ -228,6 +250,39 @@ const Settings = () => {
             </div>
           </div>
         </Section>
+
+        <Section title="Reminders" delay={0.03}>
+          <Row
+            icon={<Bell className="h-4 w-4" />}
+            iconBg="bg-primary/10 text-primary"
+            title="Daily reminder"
+            subtitle="Get a notification to review your cards"
+            right={
+              <Switch
+                checked={reminder.enabled}
+                onCheckedChange={toggleReminder}
+              />
+            }
+          />
+          {reminder.enabled && (
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="w-8 h-8 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+                <Bell className="h-4 w-4" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-foreground">Reminder time</div>
+                <div className="text-xs text-muted-foreground">Fires while the app is open</div>
+              </div>
+              <input
+                type="time"
+                value={reminder.time}
+                onChange={(e) => changeReminderTime(e.target.value)}
+                className="bg-muted text-foreground text-sm rounded-lg px-3 py-1.5 outline-none"
+              />
+            </div>
+          )}
+        </Section>
+
 
         <Section title="Data" delay={0.05}>
           <Row

@@ -13,6 +13,8 @@ import Insights from "./pages/Insights";
 import Browser from "./pages/Browser";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
+import { useEffect } from "react";
+import { scheduleReminder } from "./lib/reminders";
 
 const queryClient = new QueryClient();
 
@@ -55,18 +57,21 @@ const AnimatedRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => { scheduleReminder(); }, []);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
