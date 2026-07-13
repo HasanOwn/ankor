@@ -220,8 +220,6 @@ const Home = () => {
                     onStudy={() => navigate(`/study/${set.id}`)}
                     onEdit={() => navigate(`/words/${set.id}`)}
                     onDelete={() => setVocabSets(vocabSets.filter(s => s.id !== set.id))}
-                    onCategorize={() => handleCategorize(set)}
-                    categorizing={categorizingId === set.id}
                   />
                 </motion.div>
               ))}
