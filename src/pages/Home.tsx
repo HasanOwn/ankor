@@ -94,25 +94,9 @@ const DeckCard = ({
               </div>
             </div>
             <div className="flex border-t border-border">
-              <button onClick={onStudy} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                <Eye className="h-4 w-4" /> Study
-              </button>
-              <button onClick={onEdit} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
-                <Pencil className="h-4 w-4" /> Edit
-              </button>
-              <button
-                onClick={onCategorize}
-                disabled={categorizing || total === 0}
-                className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border disabled:opacity-50"
-              >
-                {categorizing
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
-                  : <Sparkles className="h-4 w-4" />}
-                {hasCategories ? 'Re-group' : 'AI Group'}
-              </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-destructive transition-colors border-l border-border">
+                  <button className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-destructive transition-colors">
                     <Trash2 className="h-4 w-4" /> Delete
                   </button>
                 </AlertDialogTrigger>
@@ -127,6 +111,12 @@ const DeckCard = ({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <button onClick={onEdit} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
+                <Pencil className="h-4 w-4" /> Edit
+              </button>
+              <button onClick={onStudy} className="flex-1 py-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors border-l border-border">
+                <Eye className="h-4 w-4" /> Study
+              </button>
             </div>
           </motion.div>
         )}
