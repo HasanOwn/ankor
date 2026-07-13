@@ -206,7 +206,7 @@ const Settings = () => {
             <div className="text-xs text-muted-foreground mb-3">
               Personalize buttons, links & highlights
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-10 gap-2 place-items-center">
               {ACCENTS.map((a) => {
                 const selected = accent === a.key;
                 return (
@@ -214,13 +214,13 @@ const Settings = () => {
                     key={a.key}
                     onClick={() => setAccent(a.key)}
                     aria-label={a.name}
-                    className={`relative h-9 w-9 rounded-full transition-transform ${
+                    className={`relative h-7 w-7 rounded-full transition-transform ${
                       selected ? 'scale-110 ring-2 ring-offset-2 ring-offset-card ring-foreground/40' : 'hover:scale-105'
                     }`}
                     style={{ backgroundColor: a.hex }}
                   >
                     {selected && (
-                      <Check className="absolute inset-0 m-auto h-4 w-4 text-white drop-shadow" />
+                      <Check className="absolute inset-0 m-auto h-3.5 w-3.5 text-white drop-shadow" />
                     )}
                   </button>
                 );
