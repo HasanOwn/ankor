@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, RotateCcw, Volume2 } from 'lucide-react';
@@ -21,11 +21,18 @@ const StudyMode = () => {
   const [queue, setQueue] = useState<Word[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [studiedCount, setStudiedCount] = useState(0);
+  const initializedSetId = useRef<string | null>(null);
+  const ratingLocked = useRef(false);
+  const [completed, setCompleted] = useState(false);
   const [startedAt] = useState(Date.now());
 
   useEffect(() => {
     if (!currentSet) { navigate('/'); return; }
+    // Saving a rating updates currentSet, but must not rebuild the session queue.
+    if (initializedSetId.current === currentSet.id) return;
+    initializedSetId.current = currentSet.id;
+    ratingLocked.current = false;
+    setCompleted(false);
     const now = Date.now();
     const due = (currentSet.words || []).filter(w => (w.due ?? 0) <= now);
     const list = due.length > 0 ? due : [...(currentSet.words || [])];
@@ -52,7 +59,8 @@ const StudyMode = () => {
   };
 
   const handleRate = (rating: Rating) => {
-    if (!card || !currentSet) return;
+    if (!card || !currentSet || ratingLocked.current) return;
+    ratingLocked.current = true;
     const updated = applyRating(card, rating);
     // persist back into vocabSets
     const newSets = vocabSets.map(s => s.id === currentSet.id ? {
@@ -60,14 +68,14 @@ const StudyMode = () => {
       words: s.words.map(w => w.id === card.id ? updated : w),
     } : s);
     setVocabSets(newSets);
-    setStudiedCount(c => c + 1);
     recordSession(1);
+    setRevealed(false);
 
     if (index + 1 >= queue.length) {
+      setCompleted(true);
       toast.success('Session complete!');
       setTimeout(() => navigate('/'), 600);
     } else {
-      setRevealed(false);
       setIndex(i => i + 1);
     }
   };
@@ -87,10 +95,10 @@ const StudyMode = () => {
     else setKnownWords([...knownWords, card.id]);
   };
 
-  if (!card || !currentSet) {
+  if (completed || !card || !currentSet) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-        <p className="text-muted-foreground mb-4">No cards in this deck.</p>
+        <p className="text-muted-foreground mb-4">{completed ? 'Session complete!' : 'No cards in this deck.'}</p>
         <Button onClick={() => navigate('/')}>Back home</Button>
       </div>
     );
@@ -123,7 +131,7 @@ const StudyMode = () => {
           <button onClick={toggleKnown} className={`p-1.5 rounded-full ${isKnown ? 'text-primary' : 'text-muted-foreground'}`}>
             <Star className={`h-5 w-5 ${isKnown ? 'fill-current' : ''}`} />
           </button>
-          <button onClick={() => { setRevealed(false); setIndex(0); }} className="p-1.5 rounded-full text-muted-foreground hover:text-foreground">
+          <button onClick={() => { ratingLocked.current = false; setRevealed(false); setIndex(0); }} className="p-1.5 rounded-full text-muted-foreground hover:text-foreground">
             <RotateCcw className="h-5 w-5" />
           </button>
           <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
@@ -173,23 +181,23 @@ const StudyMode = () => {
         <div className="mt-6">
           {!revealed ? (
             <Button
-              onClick={() => setRevealed(true)}
+              onClick={() => { ratingLocked.current = false; setRevealed(true); }}
               className="w-full h-14 text-base font-semibold rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Show Answer
             </Button>
-          ) : (
+          ) : previews ? (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-4 gap-2"
             >
-              <RatingButton tone="muted" label="AGAIN" interval={previews!.again.label} onClick={() => handleRate('again')} />
-              <RatingButton tone="destructive" label="HARD" interval={previews!.hard.label} onClick={() => handleRate('hard')} />
-              <RatingButton tone="success" label="GOOD" interval={previews!.good.label} onClick={() => handleRate('good')} />
-              <RatingButton tone="primary" label="EASY" interval={previews!.easy.label} onClick={() => handleRate('easy')} />
+              <RatingButton tone="muted" label="AGAIN" interval={previews.again.label} onClick={() => handleRate('again')} />
+              <RatingButton tone="destructive" label="HARD" interval={previews.hard.label} onClick={() => handleRate('hard')} />
+              <RatingButton tone="success" label="GOOD" interval={previews.good.label} onClick={() => handleRate('good')} />
+              <RatingButton tone="primary" label="EASY" interval={previews.easy.label} onClick={() => handleRate('easy')} />
             </motion.div>
-          )}
+          ) : null}
         </div>
       </main>
     </div>

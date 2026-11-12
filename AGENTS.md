@@ -1,0 +1,1 @@
+Study sessions keep their initial queue stable while ratings update saved decks, so progress and the session total do not reset.
