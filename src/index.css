@@ -121,6 +121,16 @@
 }
 
 @layer components {
+  .search-top-fade {
+    background: linear-gradient(to bottom, hsl(var(--background) / 0.96) 65%, hsl(var(--background) / 0));
+    backdrop-filter: blur(6px);
+    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+  }
+  .search-bottom-fade {
+    background: linear-gradient(to top, hsl(var(--background) / 0.75), hsl(var(--background) / 0));
+    backdrop-filter: blur(3px);
+    mask-image: linear-gradient(to top, #000 35%, transparent);
+  }
   .btn-glow {
     @apply transition-all duration-300 hover:scale-[1.02];
   }

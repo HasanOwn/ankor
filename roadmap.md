@@ -1,2 +1,3 @@
 - [x] Remove the home top-bar reload icon.
 - [x] Fix and verify study progress counting across successive answers.
+- [x] Refine the search panel and verify soft top/bottom edges and full scrolling.
