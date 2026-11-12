@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import {
-  RefreshCw, ChevronDown, Eye, Pencil,
+  ChevronDown, Eye, Pencil,
   Search as SearchIcon, Trash2, Cloud,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -161,9 +161,6 @@ const Home = () => {
                 </Button>
               }
             />
-            <Button variant="ghost" size="icon" onClick={() => window.location.reload()}>
-              <RefreshCw className="h-5 w-5 text-muted-foreground" />
-            </Button>
           </div>
         </div>
       </header>
