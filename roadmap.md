@@ -1,2 +1,2 @@
 - [x] Remove the home top-bar reload icon.
-- [ ] Fix and verify study progress counting across successive answers.
+- [x] Fix and verify study progress counting across successive answers.
