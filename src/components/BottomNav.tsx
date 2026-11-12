@@ -22,6 +22,11 @@ const BottomNav = ({ active }: BottomNavProps) => {
   const [showCreate, setShowCreate] = useState(false);
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
 
+  const goToSection = (path: string) => {
+    setFabOpen(false);
+    navigate(path);
+  };
+
   const handleCreateSet = (name: string, language?: string) => {
     const newSet: VocabSet = { id: Date.now().toString(), name, words: [], language, createdAt: Date.now() };
     setVocabSets([...vocabSets, newSet]);
@@ -77,8 +82,8 @@ const BottomNav = ({ active }: BottomNavProps) => {
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
       >
         <nav className="pointer-events-auto flex items-center gap-1 px-2 py-2 bg-card/90 backdrop-blur-xl border border-border/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-          <NavItem icon={<HomeIcon className="h-5 w-5" />} active={active === 'home'} onClick={() => navigate('/')} />
-          <NavItem icon={<SearchIcon className="h-5 w-5" />} active={active === 'browser'} onClick={() => navigate('/browser')} />
+          <NavItem icon={<HomeIcon className="h-5 w-5" />} active={active === 'home'} onClick={() => goToSection('/')} />
+          <NavItem icon={<SearchIcon className="h-5 w-5" />} active={active === 'browser'} onClick={() => goToSection('/browser')} />
 
           <button
             onClick={() => setFabOpen(o => !o)}
@@ -94,8 +99,8 @@ const BottomNav = ({ active }: BottomNavProps) => {
             </motion.span>
           </button>
 
-          <NavItem icon={<BarChart3 className="h-5 w-5" />} active={active === 'insights'} onClick={() => navigate('/insights')} />
-          <NavItem icon={<SettingsIcon className="h-5 w-5" />} active={active === 'settings'} onClick={() => navigate('/settings')} />
+          <NavItem icon={<BarChart3 className="h-5 w-5" />} active={active === 'insights'} onClick={() => goToSection('/insights')} />
+          <NavItem icon={<SettingsIcon className="h-5 w-5" />} active={active === 'settings'} onClick={() => goToSection('/settings')} />
         </nav>
       </div>
     </>
