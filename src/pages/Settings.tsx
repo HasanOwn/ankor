@@ -12,6 +12,7 @@ import { VocabSet } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { Volume2 } from 'lucide-react';
 import { getReminder, saveReminder, requestReminderPermission } from '@/lib/reminders';
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -111,6 +112,7 @@ const Settings = () => {
   const [jsonInput, setJsonInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [reminder, setReminder] = useState(() => getReminder());
+  const [autoVoice, setAutoVoice] = useLocalStorage<boolean>('ankor-auto-voice', false);
 
   const toggleReminder = async (v: boolean) => {
     if (v) {
@@ -283,6 +285,16 @@ const Settings = () => {
           )}
         </Section>
 
+
+        <Section title="Study" delay={0.04}>
+          <Row
+            icon={<Volume2 className="h-4 w-4" />}
+            iconBg="bg-primary/10 text-primary"
+            title="Auto voice"
+            subtitle="Read each word aloud when it appears"
+            right={<Switch checked={autoVoice} onCheckedChange={setAutoVoice} />}
+          />
+        </Section>
 
         <Section title="Data" delay={0.05}>
           <Row

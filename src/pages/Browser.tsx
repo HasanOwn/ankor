@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useDeferredValue, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Search as SearchIcon, Pencil, X } from 'lucide-react';
@@ -19,13 +19,15 @@ const Browser = () => {
   const navigate = useNavigate();
   const [vocabSets, setVocabSets] = useLocalStorage<VocabSet[]>('korean-vocab-sets', []);
   const [q, setQ] = useState('');
-  const [deckFilter, setDeckFilter] = useState<string>('all');
-  const [stateFilter, setStateFilter] = useState<StateFilter>('all');
+  const [deckFilter, setDeckFilter] = useLocalStorage<string>('browser-deck-filter', 'all');
+  const [limit, setLimit] = useState(40);
+  const dq = useDeferredValue(q);
+  const [stateFilter, setStateFilter] = useLocalStorage<StateFilter>('browser-state-filter', 'all');
   const [editing, setEditing] = useState<Row | null>(null);
 
   const rows = useMemo<Row[]>(() => {
     const now = Date.now();
-    const ql = q.trim().toLowerCase();
+    const ql = dq.trim().toLowerCase();
     const out: Row[] = [];
     for (const s of vocabSets) {
       if (deckFilter !== 'all' && s.id !== deckFilter) continue;
@@ -42,7 +44,16 @@ const Browser = () => {
     }
     out.sort((a, b) => (b.word.createdAt || 0) - (a.word.createdAt || 0));
     return out;
-  }, [vocabSets, q, deckFilter, stateFilter]);
+  }, [vocabSets, dq, deckFilter, stateFilter]);
+
+  useEffect(() => { setLimit(40); }, [dq, deckFilter, stateFilter]);
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.innerHeight + window.scrollY > document.body.offsetHeight - 800) setLimit(l => l + 40);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleSave = (data: Omit<Word, 'id' | 'createdAt'>) => {
     if (!editing) return;
@@ -95,7 +106,7 @@ const Browser = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All decks</SelectItem>
-                {vocabSets.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                {[...vocabSets].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={stateFilter} onValueChange={(v) => setStateFilter(v as StateFilter)}>
@@ -123,7 +134,7 @@ const Browser = () => {
           </motion.div>
         ) : (
           <ul className="space-y-2">
-            {rows.map((r, i) => (
+            {rows.slice(0, limit).map((r, i) => (
               <motion.li key={`${r.setId}-${r.word.id}`}
                 initial={i < 14 ? { opacity: 0, y: 8 } : false}
                 animate={{ opacity: 1, y: 0 }}
