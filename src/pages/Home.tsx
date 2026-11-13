@@ -205,7 +205,7 @@ const Home = () => {
             </motion.div>
           ) : (
             <div className="space-y-3">
-              {vocabSets.map((set, i) => (
+              {[...vocabSets].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })).map((set, i) => (
                 <motion.div
                   key={set.id}
                   initial={{ opacity: 0, y: 8 }}

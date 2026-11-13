@@ -44,52 +44,52 @@ const WordForm = ({ word, onSave, onCancel }: WordFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="term">Word / Term *</Label>
+        <Label className="text-xs font-medium text-muted-foreground" htmlFor="term">Word / Term *</Label>
         <Input
           id="term"
           value={term}
           onChange={(e) => setTerm(e.target.value)}
           required
-          className="bg-secondary border-border"
+          className="mt-1.5 bg-muted/60 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/40"
         />
       </div>
 
       <div>
-        <Label htmlFor="translation">Translation *</Label>
+        <Label className="text-xs font-medium text-muted-foreground" htmlFor="translation">Translation *</Label>
         <Input
           id="translation"
           value={translation}
           onChange={(e) => setTranslation(e.target.value)}
           required
-          className="bg-secondary border-border"
+          className="mt-1.5 bg-muted/60 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/40"
         />
       </div>
 
       <div>
-        <Label htmlFor="pronunciation">Pronunciation (optional)</Label>
+        <Label className="text-xs font-medium text-muted-foreground" htmlFor="pronunciation">Pronunciation (optional)</Label>
         <Input
           id="pronunciation"
           value={pronunciation}
           onChange={(e) => setPronunciation(e.target.value)}
-          className="bg-secondary border-border"
+          className="mt-1.5 bg-muted/60 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/40"
         />
       </div>
 
       <div>
-        <Label htmlFor="example">Example Sentence (optional)</Label>
+        <Label className="text-xs font-medium text-muted-foreground" htmlFor="example">Example Sentence (optional)</Label>
         <Textarea
           id="example"
           value={example}
           onChange={(e) => setExample(e.target.value)}
-          className="bg-secondary border-border"
+          className="mt-1.5 bg-muted/60 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/40"
         />
       </div>
 
-      <div className="flex gap-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+      <div className="flex gap-2 pt-2">
+        <Button type="submit" className="flex-1 h-11 rounded-xl">
           {word ? 'Update' : 'Add'} Word
         </Button>
-        <Button type="button" onClick={onCancel} variant="outline" className="flex-1">
+        <Button type="button" onClick={onCancel} variant="secondary" className="flex-1 h-11 rounded-xl">
           Cancel
         </Button>
       </div>

@@ -7,8 +7,9 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
 
+    const body = await req.json().catch(() => ({}));
     const expectedToken = Deno.env.get('CATEGORIZE_CLIENT_TOKEN');
-    const providedToken = req.headers.get('x-app-token');
+    const providedToken = req.headers.get('x-app-token') ?? body?.appToken;
     if (!expectedToken || providedToken !== expectedToken) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -16,7 +17,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { words } = await req.json();
+    const { words } = body;
     if (!Array.isArray(words) || words.length === 0) {
       return new Response(JSON.stringify({ error: 'words array required' }), {
         status: 400,

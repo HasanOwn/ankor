@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Plus, Edit, Trash2, ArrowLeft, Sparkles, Loader2, XCircle } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Volume2, ArrowLeft, Sparkles, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Header from '@/components/Header';
@@ -17,6 +17,15 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+
+const speakWord = (text: string, lang?: string) => {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang || 'ko-KR';
+  u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+};
 
 const WordList = () => {
   const { setId } = useParams<{ setId: string }>();
@@ -106,8 +115,7 @@ const WordList = () => {
     try {
       const payload = currentSet.words.map(w => ({ id: w.id, term: w.korean, translation: w.uzbek }));
       const { data, error } = await supabase.functions.invoke('categorize-words', {
-        body: { words: payload },
-        headers: { 'x-app-token': 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
+        body: { words: payload, appToken: 'su0o8wLH0LSIIkEd5WFPvd4D4GlEE5fX' },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -135,49 +143,50 @@ const WordList = () => {
   const renderWordCard = (word: Word) => (
     <div key={word.id}>
       {editingWord?.id === word.id ? (
-        <div className="p-6 bg-card border border-border rounded-xl">
-          <h2 className="text-xl font-semibold mb-4">Edit Word</h2>
+        <div className="p-5 bg-card rounded-2xl card-elev">
+          <h2 className="text-lg font-semibold mb-4 text-center">Edit word</h2>
           <WordForm word={editingWord} onSave={handleUpdateWord} onCancel={() => setEditingWord(null)} />
         </div>
       ) : (
-        <div className="p-4 bg-card border border-border rounded-xl hover:bg-accent/50 transition-colors">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 space-y-1">
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <h3 className="text-2xl font-semibold">{word.korean}</h3>
-                {word.romanization && (
-                  <span className="text-sm text-muted-foreground">{word.romanization}</span>
-                )}
-              </div>
-              <p className="text-lg text-muted-foreground">{word.uzbek}</p>
-              {word.example && <p className="text-sm text-muted-foreground italic mt-2">{word.example}</p>}
+        <div className="bg-card rounded-2xl card-elev p-4 flex items-center gap-3">
+          <button
+            onClick={() => speakWord(word.korean, currentSet.language)}
+            aria-label="Pronounce"
+            className="h-11 w-11 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+          >
+            <Volume2 className="h-5 w-5" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className="text-xl font-semibold text-foreground truncate">{word.korean}</h3>
+              {word.romanization && (
+                <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] text-muted-foreground truncate">{word.romanization}</span>
+              )}
             </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setEditingWord(word)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-destructive/20 hover:text-destructive">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this word?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-muted-foreground">
-                      This will permanently delete "{word.korean}" from this set.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-secondary">Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteWord(word.id)} className="bg-destructive text-destructive-foreground">
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            <p className="text-sm text-muted-foreground mt-0.5 truncate">{word.uzbek}</p>
+            {word.example && <p className="text-xs text-muted-foreground/80 italic mt-1 line-clamp-2">{word.example}</p>}
+          </div>
+          <div className="flex shrink-0">
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setEditingWord(word)} aria-label="Edit">
+              <Edit className="h-4 w-4" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/15 hover:text-destructive" aria-label="Delete">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this word?</AlertDialogTitle>
+                  <AlertDialogDescription>"{word.korean}" will be removed from this deck.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleDeleteWord(word.id)} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       )}
@@ -206,8 +215,8 @@ const WordList = () => {
           </div>
 
           {showForm && !editingWord && (
-            <div className="p-6 bg-card border border-border rounded-xl">
-              <h2 className="text-xl font-semibold mb-4">Add New Word</h2>
+            <div className="p-5 bg-card rounded-2xl card-elev">
+              <h2 className="text-lg font-semibold mb-4 text-center">Add new word</h2>
               <WordForm onSave={handleAddWord} onCancel={() => setShowForm(false)} />
             </div>
           )}
