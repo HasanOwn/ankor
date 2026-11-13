@@ -45,7 +45,7 @@ const CreateSetDialog = ({ open, onOpenChange, onCreateSet }: CreateSetDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Vocabulary Set</DialogTitle>
           <DialogDescription className="text-muted-foreground">

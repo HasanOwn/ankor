@@ -337,14 +337,14 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
                   placeholder=""
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="rounded-xl h-11 bg-muted/40 border-border/60"
+                  className="rounded-xl h-11 bg-muted/60 border-0"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="set-select" className="text-xs text-muted-foreground">Pick a deck</Label>
                 <Select value={selectedSet} onValueChange={setSelectedSet}>
-                  <SelectTrigger id="set-select" className="h-11 rounded-xl bg-muted/40 border-border/60">
+                  <SelectTrigger id="set-select" className="h-11 rounded-xl bg-muted/60 border-0">
                     <SelectValue placeholder="Choose a deck…" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -394,7 +394,7 @@ export const CloudShareDialog = ({ vocabSets, onImport, trigger }: CloudShareDia
                     value={searchUsername}
                     onChange={(e) => setSearchUsername(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="rounded-xl h-11 bg-muted/40 border-border/60"
+                    className="rounded-xl h-11 bg-muted/60 border-0"
                   />
                   <Button onClick={handleSearch} disabled={isSearching} className="rounded-xl h-11 px-4">
                     {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}

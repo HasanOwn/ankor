@@ -162,7 +162,7 @@ const WordList = () => {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-card border-border">
+                <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete this word?</AlertDialogTitle>
                     <AlertDialogDescription className="text-muted-foreground">
