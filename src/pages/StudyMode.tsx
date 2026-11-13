@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, RotateCcw, Volume2 } from 'lucide-react';
+import { ArrowLeft, Star, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { useLocalStorage as useLS } from '@/hooks/useLocalStorage';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet, Word } from '@/types/word';
 import { Button } from '@/components/ui/button';
@@ -89,6 +90,12 @@ const StudyMode = () => {
     window.speechSynthesis.speak(u);
   };
 
+  const [autoVoice, setAutoVoice] = useLS<boolean>('ankor-auto-voice', false);
+  useEffect(() => {
+    if (autoVoice && card) handleSpeak();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card?.id, autoVoice]);
+
   const toggleKnown = () => {
     if (!card) return;
     if (knownWords.includes(card.id)) setKnownWords(knownWords.filter(id => id !== card.id));
@@ -116,6 +123,10 @@ const StudyMode = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="font-semibold text-foreground flex-1 truncate">{currentSet.name}</h1>
+          <Button variant="ghost" size="icon" className="rounded-full" aria-label="Auto voice"
+            onClick={() => setAutoVoice(!autoVoice)}>
+            {autoVoice ? <Volume2 className="h-5 w-5 text-primary" /> : <VolumeX className="h-5 w-5 text-muted-foreground" />}
+          </Button>
           <span className="px-2.5 py-1 rounded-full bg-badge-review text-badge-review-foreground text-xs font-medium">
             {counts.review} Review
           </span>
