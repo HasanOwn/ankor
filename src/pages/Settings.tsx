@@ -372,10 +372,10 @@ const Settings = () => {
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
             placeholder='[{"set":"My Set","korean":"term","uzbek":"translation"}]'
-            className="min-h-[160px] font-mono text-sm"
+            className="min-h-[160px] font-mono text-sm rounded-2xl bg-muted/60 border-0 resize-none focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setJsonOpen(false)}>Cancel</Button>
+            <Button variant="ghost" className="bg-muted hover:bg-accent" onClick={() => setJsonOpen(false)}>Cancel</Button>
             <Button onClick={handleJsonImport} disabled={!jsonInput.trim()}>
               <FileJson className="h-4 w-4 mr-2" /> Import
             </Button>
