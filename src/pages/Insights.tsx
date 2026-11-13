@@ -108,7 +108,7 @@ const Insights = () => {
                   <div className="text-[10px] font-medium text-muted-foreground h-4">
                     {d.cards > 0 ? d.cards : ''}
                   </div>
-                  <div className="w-full flex-1 flex items-end">
+                  <div className="w-full h-32 flex items-end">
                     <motion.div
                       initial={{ height: 0 }}
                       animate={{ height: `${h}%` }}

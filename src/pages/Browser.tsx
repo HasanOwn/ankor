@@ -66,7 +66,7 @@ const Browser = () => {
   return (
     <div className="min-h-screen bg-background pb-28">
 
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
+      <motion.header initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="sticky top-0 z-30 bg-background/85 backdrop-blur-md">
         <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
             <ArrowLeft className="h-5 w-5" />
@@ -112,7 +112,7 @@ const Browser = () => {
             </Select>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <main className="container max-w-2xl mx-auto px-4 pt-2">
         <div className="text-xs text-muted-foreground mb-3">{rows.length} card{rows.length === 1 ? '' : 's'}</div>
@@ -123,8 +123,11 @@ const Browser = () => {
           </motion.div>
         ) : (
           <ul className="space-y-2">
-            {rows.map((r) => (
-              <li key={`${r.setId}-${r.word.id}`}>
+            {rows.map((r, i) => (
+              <motion.li key={`${r.setId}-${r.word.id}`}
+                initial={i < 14 ? { opacity: 0, y: 8 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 + Math.min(i, 14) * 0.03, duration: 0.25, ease: [0.22, 1, 0.36, 1] }}>
                 <button
                   onClick={() => setEditing(r)}
                   className="w-full text-left bg-card rounded-2xl card-elev p-4 hover:bg-accent transition-colors flex items-start gap-3"
@@ -144,7 +147,7 @@ const Browser = () => {
                   </div>
                   <Pencil className="h-4 w-4 text-muted-foreground mt-1" />
                 </button>
-              </li>
+              </motion.li>
             ))}
           </ul>
         )}
