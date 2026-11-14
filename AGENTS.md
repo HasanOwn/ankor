@@ -1,1 +1,2 @@
 Study sessions keep their initial queue stable while ratings update saved decks, so progress and the session total do not reset.
+WordForm preserves existing word metadata on edit so vocabulary changes never reset saved scheduling or learning progress.

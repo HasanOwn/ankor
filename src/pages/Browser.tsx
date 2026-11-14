@@ -94,9 +94,9 @@ const Browser = () => {
               className="pl-10 pr-10 bg-muted/50 border-0 rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-primary/30"
             />
             {q && (
-              <button onClick={() => setQ('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <Button variant="ghost" size="icon" aria-label="Clear search" onClick={() => setQ('')} className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground">
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             )}
           </div>
           <div className="flex gap-4">
@@ -139,25 +139,22 @@ const Browser = () => {
                 initial={i < 14 ? { opacity: 0, y: 8 } : false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 + Math.min(i, 14) * 0.03, duration: 0.25, ease: [0.22, 1, 0.36, 1] }}>
-                <button
-                  onClick={() => setEditing(r)}
-                  className="w-full text-left bg-card rounded-2xl card-elev p-4 hover:bg-accent transition-colors flex items-start gap-3"
-                >
+                <div className="w-full bg-card rounded-2xl card-elev px-4 py-3 flex items-center gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="font-semibold text-foreground truncate">{r.word.korean}</span>
-                      {r.word.romanization && (
-                        <span className="text-xs text-muted-foreground">{r.word.romanization}</span>
-                      )}
+                    <div className="grid grid-cols-2 items-baseline gap-x-4">
+                      <span className="text-base font-semibold text-foreground break-words leading-snug">{r.word.korean}</span>
+                      <span className="text-sm text-foreground/80 break-words leading-snug text-right">{r.word.uzbek}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground truncate">{r.word.uzbek}</div>
-                    <div className="flex items-center gap-2 mt-1.5">
+                    <div className="flex items-center gap-2 mt-1.5 min-w-0">
+                      {r.word.romanization && <span className="text-xs text-muted-foreground truncate">{r.word.romanization}</span>}
+                      <span className="text-[10px] text-muted-foreground truncate ml-auto">{r.setName}</span>
                       {stateBadge(r.word)}
-                      <span className="text-[10px] text-muted-foreground">· {r.setName}</span>
                     </div>
                   </div>
-                  <Pencil className="h-4 w-4 text-muted-foreground mt-1" />
-                </button>
+                  <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" aria-label={`Edit ${r.word.korean}`} title="Edit card" onClick={() => setEditing(r)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
               </motion.li>
             ))}
           </ul>
