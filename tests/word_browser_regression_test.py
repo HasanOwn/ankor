@@ -61,6 +61,7 @@ async def main():
         await page.get_by_role('button', name='Clear search').click()
         await expect(page.locator('main li')).to_have_count(3)
         await page.set_viewport_size({'width': 393, 'height': 852})
+        await page.wait_for_timeout(800)
         await page.screenshot(path=str(SHOTS / 'browser-mobile-dark.png'))
         await page.goto(f'{ORIGIN}/words/ui-check')
         await page.get_by_role('button', name='Pronounce').first.click()
@@ -106,6 +107,7 @@ async def main():
             window.speechSynthesis.speak = u => window.voiceCalls.push({text:u.text, lang:u.lang});
         }''')
         await page.locator('nav button').first.click()
+        await page.get_by_role('button', name='Vocab 1', exact=False).first.click()
         await page.get_by_role('button', name='Study', exact=True).first.click()
         await expect(page.get_by_role('button', name='Show Answer')).to_be_visible()
         await page.wait_for_function('window.voiceCalls.length === 1')
@@ -122,6 +124,7 @@ async def main():
         await page.goto(f'{ORIGIN}/browser')
         await page.evaluate("localStorage.setItem('ankor-theme','light')")
         await page.reload()
+        await page.wait_for_timeout(800)
         await page.screenshot(path=str(SHOTS / 'browser-mobile-light.png'))
         assert not errors, errors
         print('PASS: pencil-only editing, metadata preservation, filters, Word List CRUD/navigation, auto-voice on/off, and missing-deck handling; no runtime errors.')
