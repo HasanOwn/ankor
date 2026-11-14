@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Search as SearchIcon, X, BookOpen } from 'lucide-react';
 import { Input } from '@/components/ui/input';
