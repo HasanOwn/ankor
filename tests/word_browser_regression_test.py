@@ -51,6 +51,8 @@ async def main():
         edited = next(w for w in saved[0]['words'] if w['id'] == 1)
         for key in ['state', 'interval', 'ease', 'due', 'lapses', 'isKnown']:
             assert edited[key] == words[0][key], (key, edited)
+        await expect(page.get_by_role('dialog')).to_have_count(0)
+        await page.wait_for_timeout(800)
         await page.screenshot(path=str(SHOTS / 'browser-desktop-dark.png'))
         await page.goto(f'{ORIGIN}/settings')
         await page.goto(f'{ORIGIN}/browser')
