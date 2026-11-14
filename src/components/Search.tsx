@@ -17,6 +17,17 @@ interface SearchResult extends Word {
 
 const Search = ({ vocabSets, onClose }: SearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const input = inputRef.current;
+      if (!input) return;
+      input.focus({ preventScroll: true });
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];

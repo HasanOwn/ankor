@@ -8,6 +8,7 @@ import WordForm from '@/components/WordForm';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet, Word, SortOption } from '@/types/word';
 import { toast } from 'sonner';
+import { speakText } from '@/lib/speech';
 import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
