@@ -30,6 +30,7 @@ const WordForm = ({ word, onSave, onCancel }: WordFormProps) => {
     e.preventDefault();
     if (!term.trim() || !translation.trim()) return;
     onSave({
+      ...word,
       set: word?.set,
       korean: term.trim(),
       uzbek: translation.trim(),

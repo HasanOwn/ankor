@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Search, Plus, Edit, Trash2, Volume2, ArrowLeft, Sparkles, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Header from '@/components/Header';
 import WordForm from '@/components/WordForm';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { VocabSet, Word, SortOption } from '@/types/word';
@@ -39,20 +38,8 @@ const WordList = () => {
 
   const currentSet = vocabSets.find(set => set.id === setId);
 
-  if (!currentSet) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container max-w-4xl mx-auto px-4 pt-24 pb-12 text-center">
-          <p className="text-muted-foreground">Set not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">Go Home</Button>
-        </main>
-      </div>
-    );
-  }
-
   const filteredWords = useMemo(() => {
-    let words = [...currentSet.words];
+    let words = [...(currentSet?.words ?? [])];
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       words = words.filter(word =>
@@ -67,20 +54,32 @@ const WordList = () => {
       words.sort((a, b) => b.createdAt - a.createdAt);
     }
     return words;
-  }, [currentSet.words, searchQuery, sortOption]);
+  }, [currentSet?.words, searchQuery, sortOption]);
 
-  const hasCategories = currentSet.words.some(w => w.category);
+  const hasCategories = currentSet?.words.some(w => w.category) ?? false;
 
   const groupedWords = useMemo(() => {
     if (!hasCategories) return null;
     const groups = new Map<string, Word[]>();
     for (const w of filteredWords) {
       const key = w.category || 'Uncategorized';
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(w);
+      const group = groups.get(key) ?? [];
+      group.push(w);
+      groups.set(key, group);
     }
     return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [filteredWords, hasCategories]);
+
+  if (!currentSet) {
+    return (
+      <div className="min-h-screen bg-background">
+        <main className="container max-w-4xl mx-auto px-4 py-12 text-center">
+          <p className="text-muted-foreground">Set not found</p>
+          <Button onClick={() => navigate('/')} className="mt-4">Go Home</Button>
+        </main>
+      </div>
+    );
+  }
 
   const persistSet = (updated: VocabSet) => {
     setVocabSets(vocabSets.map(s => s.id === setId ? updated : s));
@@ -149,13 +148,13 @@ const WordList = () => {
         </div>
       ) : (
         <div className="bg-card rounded-2xl card-elev p-4 flex items-center gap-3">
-          <button
+          <Button variant="ghost" size="icon"
             onClick={() => speakWord(word.korean, currentSet.language)}
             aria-label="Pronounce"
             className="h-11 w-11 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
           >
             <Volume2 className="h-5 w-5" />
-          </button>
+          </Button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <h3 className="text-xl font-semibold text-foreground truncate">{word.korean}</h3>
@@ -195,16 +194,15 @@ const WordList = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container max-w-4xl mx-auto px-4 pt-24 pb-12">
+      <main className="container max-w-4xl mx-auto px-4 pt-5 pb-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/')} aria-label="Back to decks">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold">{currentSet.name}</h1>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold break-words">{currentSet.name}</h1>
                 <p className="text-muted-foreground">{currentSet.words.length} words</p>
               </div>
             </div>

@@ -1,3 +1,6 @@
 - [x] Remove the home top-bar reload icon.
 - [x] Fix and verify study progress counting across successive answers.
 - [x] Refine the search panel and verify soft top/bottom edges and full scrolling.
+- [ ] Remove the redundant Word List header while retaining deck navigation.
+- [ ] Compact Browser cards and limit editing to the pencil control.
+- [ ] Verify Word List, Browser filters/editing, study auto-voice, and live AI categorization.
