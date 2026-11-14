@@ -8,9 +8,10 @@ import {
 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTheme, ACCENTS } from '@/components/ThemeProvider';
-import { VocabSet } from '@/types/word';
+import { VocabSet, Word } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Volume2 } from 'lucide-react';
 import { getReminder, saveReminder, requestReminderPermission } from '@/lib/reminders';

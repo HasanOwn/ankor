@@ -8,6 +8,7 @@ import { VocabSet, Word } from '@/types/word';
 import { Button } from '@/components/ui/button';
 import { applyRating, previewIntervals, bucketCounts, Rating } from '@/lib/srs';
 import { toast } from 'sonner';
+import { cancelSpeech, speakText } from '@/lib/speech';
 
 interface StudySession { date: string; cards: number; minutes: number; }
 
